@@ -33,7 +33,7 @@ into focused skills that are activated when they are relevant.
 | One oversized instruction file | Modular skills with clear triggers |
 | Work disappears between sessions | WIP state and persistent knowledge |
 | “It looked done” | Cleanup, QA, and explicit verification |
-| Reviews happen too late | Frontend, database, and security reviews |
+| Reviews happen too late | Read-only `/changes-review` and `/project-review` |
 | Risky defaults | Read-only data access and guarded Git actions |
 | Reports take too long | Consistent, evidence-based reporting |
 
@@ -45,27 +45,33 @@ into focused skills that are activated when they are relevant.
         A clear request
               │
               ▼
-       Discover the context
-       project · code · notes
+     Understand the change
+ requirements · architecture
               │
               ▼
-         Plan and build
+          Plan and build
               │
               ▼
-      Focused review when needed
-   UI · data · security · Git
+        /changes-review
+   when the implementation
+      needs a review
               │
               ▼
-       Verify and clean up
-     tests · lint · build · QA
+         /cleanup
+  when the work is finished
               │
               ▼
-       Report and preserve
-     WIP · reports · knowledge
+     /deployment-check
+   before production
+              │
+              ▼
+        /git-push
+   when you ask for it
 ```
 
-GENTJIN supports the full development loop without forcing every workflow into
-every conversation.
+`/project-review` is the optional deeper audit of an entire codebase, not
+something expected on every feature. GENTJIN supports the full development loop
+without forcing every workflow into every conversation.
 
 ## Quick start
 
@@ -111,6 +117,8 @@ re-checks the Knowledge Vault permission.
 | `/status` | See the branch, pending changes, active WIP, and open questions. |
 | `/task` | Handle a general-purpose software or laptop task, with reusable workflow memory and `vscode` and `dev` branches. |
 | `/deployment-check` | Analyze deployment readiness, report blockers and warnings, and suggest next steps without modifying the project until you approve. |
+| `/changes-review` | Review the current changes and their impact radius without modifying the project until you approve fixes. |
+| `/project-review` | After confirmation, perform a comprehensive read-only review of the entire relevant project and suggest improvements before any changes are made. |
 | `/git-push` | Commit and push the current changes on a new branch, asking for approval first. |
 
 Commands are intentionally short entry points into larger, repeatable
@@ -123,10 +131,20 @@ of asking the agent to remember every rule at once.
 
 | Skill | Focus |
 | --- | --- |
-| `cleanup` | Pre-merge QA, debugging, cleanup, and production readiness. |
-| `frontend-review` | Responsive UI, accessibility, UX states, and performance. |
+| `requirements-review` | Ambiguity, constraints, conflicts, and acceptance criteria before implementation. |
+| `architecture-review` | Structural changes, module boundaries, data flow, and migration paths. |
+| `frontend-review` | Responsive UI, accessibility, UX states, and frontend performance. |
+| `backend-review` | Handlers, services, jobs, webhooks, async behavior, retries, and idempotency. |
 | `database-review` | Queries, data layers, performance, failures, and migration safety. |
+| `api-design` | Request/response contracts, validation, pagination, and versioning. |
+| `integration-review` | Defects at the seams between layers and systems. |
+| `systematic-debugging` | Root-cause workflow for broken behavior and regressions. |
+| `test-strategy` | Risk-driven decisions about what to test and at which level. |
 | `security-review` | Authentication, authorization, secrets, input, and data integrity. |
+| `performance-review` | Evidence-based measurement, bottlenecks, and safe optimization. |
+| `dependency-review` | Dependency additions, upgrades, and replacement risk. |
+| `review-orchestrator` | Shared engine behind the review commands; delegates to the skills above. |
+| `cleanup` | Pre-merge QA, debugging, cleanup, and production readiness. |
 | `git-workflow` | Guarded branches, commits, pull requests, and source control. |
 | `work-in-progress` | Pause, resume, and preserve unfinished implementation work. |
 | `knowledge-vault` | Project discovery and persistent knowledge in the Knowledge Vault. |
@@ -139,6 +157,8 @@ of asking the agent to remember every rule at once.
 - Discover the project and its existing knowledge.
 - Check active WIP, open questions, and recent decisions.
 - Start from the current source code rather than assumptions.
+- Use `requirements-review` and `architecture-review` when the request is
+  ambiguous or the change is structural.
 
 ### During the work
 
@@ -152,6 +172,8 @@ of asking the agent to remember every rule at once.
 - Check loading, error, empty, nullable, and failure states.
 - Run the project's real test, lint, typecheck, and build commands.
 - Remove temporary artifacts and unnecessary logs.
+- Run `/changes-review` when the work needs a read-only second opinion before
+  fixes.
 
 ### After the work
 
@@ -182,20 +204,34 @@ GENTJIN is designed to make the cautious path the easy path:
 ├── AGENTS.md                 Global behavior and project-agnostic rules
 ├── INSTALL.md                Agent-assisted installation runbook
 ├── command/                  Reusable slash commands
+│   ├── changes-review.md
 │   ├── cleanup.md
+│   ├── deployment-check.md
+│   ├── git-push.md
 │   ├── install-gentjin.md
+│   ├── project-review.md
 │   ├── report.md
 │   ├── status.md
 │   ├── task.md
 │   └── update-gentjin.md
 ├── skills/                   Focused, trigger-based workflows
+│   ├── api-design/
+│   ├── architecture-review/
+│   ├── backend-review/
 │   ├── cleanup/
 │   ├── database-review/
+│   ├── dependency-review/
 │   ├── frontend-review/
 │   ├── git-workflow/
+│   ├── integration-review/
 │   ├── knowledge-vault/
+│   ├── performance-review/
 │   ├── reporting/
+│   ├── requirements-review/
+│   ├── review-orchestrator/
 │   ├── security-review/
+│   ├── systematic-debugging/
+│   ├── test-strategy/
 │   └── work-in-progress/
 └── opencode.jsonc            Local OpenCode configuration (not installed)
 ```

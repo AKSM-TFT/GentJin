@@ -291,21 +291,40 @@ the OpenCode root. At minimum, confirm:
 
 ```text
 AGENTS.md
+command/changes-review.md
 command/cleanup.md
+command/deployment-check.md
+command/git-push.md
 command/install-gentjin.md
+command/project-review.md
 command/report.md
 command/status.md
 command/task.md
 command/update-gentjin.md
+skills/api-design/SKILL.md
+skills/architecture-review/SKILL.md
+skills/backend-review/SKILL.md
 skills/cleanup/SKILL.md
 skills/database-review/SKILL.md
+skills/dependency-review/SKILL.md
 skills/frontend-review/SKILL.md
 skills/git-workflow/SKILL.md
+skills/integration-review/SKILL.md
 skills/knowledge-vault/SKILL.md
+skills/performance-review/SKILL.md
 skills/reporting/SKILL.md
+skills/requirements-review/SKILL.md
+skills/review-orchestrator/SKILL.md
 skills/security-review/SKILL.md
+skills/systematic-debugging/SKILL.md
+skills/test-strategy/SKILL.md
 skills/work-in-progress/SKILL.md
 ```
+
+The payload is copied by directory (`command/` and `skills/` recursively), so
+new files are installed automatically. Keep this list current: when a skill or
+command is added or removed, update this minimum set in the same change so
+verification still detects a missing install.
 
 Also confirm:
 

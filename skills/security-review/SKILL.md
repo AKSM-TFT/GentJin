@@ -29,3 +29,6 @@ For downloaded or unfamiliar code, inspect install/build scripts, lifecycle hook
 
 ## Reporting
 State concrete findings and evidence. Distinguish confirmed issues from risks requiring further verification. Do not claim a security property was verified if the necessary environment/test could not be run.
+
+## Related Skills
+Keep authentication, authorization, user-owned record access, secrets and tokens, input trust boundaries, sensitive logging, and security/data-integrity concerns here. Use `dependency-review` for dependency risk, advisories, and install scripts; `backend-review` for retry and idempotency behavior; `api-design` for error-contract and versioning safety. Do not split these into separate auth, authorization, or secret skills unless this skill stops being usable.

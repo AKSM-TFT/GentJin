@@ -15,11 +15,12 @@ Before a requested commit or source-control change:
 - Understand what belongs to the logical change.
 
 ## Branches
-Default naming when the repository has no stronger convention:
-- `feature/<short-name>`
-- `fix/<short-name>`
-- `refactor/<short-name>`
-- `chore/<short-name>`
+- Inspect the repository's existing branches to detect its naming convention.
+- If the repository has its own format, follow it and continue its sequence.
+- If it has no format, use `<project-initials>-<zero-padded-increment>-<description>` (for example `GJ-01-changes-in-here`, `GJ-02-changes-in-here`).
+- Show the exact branch name and ask for explicit approval before creating, committing on, or pushing it. If the user rejects the name, use the name they provide.
+- Never push directly to `main`, `development`, `production`, or another protected or shared branch.
+- The `/git-push` command implements this workflow end to end.
 
 ## Commits
 Create one focused commit per logical unit. Prefer a short imperative subject, blank line, and concise body explaining why when useful. Match existing repository commit style when present.
