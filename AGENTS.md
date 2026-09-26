@@ -96,16 +96,37 @@ When the user asks to push to GitHub (or any remote):
 
 Use the appropriate skill when specialized work is required:
 
+Understand:
+- `requirements-review` - ambiguous requests, missing constraints, conflicts, and acceptance criteria.
+- `architecture-review` - subsystems, structural changes, boundaries, and migration paths.
+
+Build and change:
+- `frontend-review` - responsive UI, UX, accessibility, optimistic UI, and frontend-specific performance.
+- `backend-review` - handlers, services, jobs, webhooks, async behavior, retries, and idempotency.
+- `database-review` - query/data-layer review, database safety, schema/migration safeguards, and data integrity.
+- `api-design` - request/response contracts, validation, status codes, pagination, and versioning.
+- `integration-review` - defects at layer boundaries such as frontend to API, service to database, or webhook to handler.
+
+Diagnose:
+- `systematic-debugging` - root-cause workflow for broken behavior, failing builds or tests, and regressions.
+
+Verify:
+- `test-strategy` - what to test and at which level, driven by risk.
+- `security-review` - authentication, authorization, secrets, validation, sensitive logging, and security/data-integrity review.
+- `performance-review` - evidence-based performance and optimization work.
+- `dependency-review` - dependency additions, upgrades, and replacements.
+
+Finish and preserve:
+- `cleanup` - pre-main QA, debugging, testing, code quality, tooling verification, and production-readiness review.
+- `git-workflow` - Git status/diff/history review, branch/commit conventions, and guarded source-control actions.
 - `knowledge-vault` - project discovery, vault structure, note retrieval, note capture, migration, ADRs, questions, enhancements, and sessions.
 - `work-in-progress` - pause, resume, active WIP tracking, completion, and next-action preservation.
-- `cleanup` - pre-main QA, debugging, testing, code quality, tooling verification, and production-readiness review.
-- `frontend-review` - responsive UI, UX, accessibility, optimistic UI, frontend performance, and fallback review.
-- `database-review` - query/data-layer review, database safety, schema/migration safeguards, and data integrity.
-- `security-review` - authentication, authorization, secrets, validation, sensitive logging, and security/data-integrity review.
 - `reporting` - change reports, cleanup reports, report titles, report evidence, and console/vault report formats.
-- `git-workflow` - Git status/diff/history review, branch/commit conventions, and guarded source-control actions.
 
-Do not run every specialized workflow for every task. Load and follow only the skill(s) relevant to the current task.
+Review coordination:
+- `review-orchestrator` - shared engine behind `/changes-review` and `/project-review`; maps scope, delegates to the relevant skills, and produces one report.
+
+Do not run every specialized workflow for every task. Load and follow only the skill(s) relevant to the current task. A skill provides guidance, not permission.
 
 ## Definition of Done
 

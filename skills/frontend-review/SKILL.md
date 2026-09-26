@@ -27,7 +27,7 @@ Use optimistic updates only for fast mutations where rollback/reconciliation are
 Verify keyboard access, input labels, accessible names for icon-only buttons, semantic HTML, usable focus behavior, non-color-only state communication, and accessible dialogs/menus/sheets/popovers.
 
 ## Frontend Performance
-Check for unnecessary React re-renders, bad effect dependencies, repeated expensive calculations, duplicate/client-only fetching, oversized client components, unnecessary large dependencies, unoptimized media, layout shifts, sequential requests that can run concurrently, and large-list rendering issues. Optimize only where benefit is clear.
+Check for unnecessary React re-renders, bad effect dependencies, repeated expensive calculations, duplicate/client-only fetching, oversized client components, unnecessary large dependencies, unoptimized media, layout shifts, sequential requests that can run concurrently, and large-list rendering issues. Optimize only where benefit is clear. For cross-stack performance methodology such as measurement, caching, N+1 behavior, and resource leaks, use `performance-review`.
 
 ## Real Data and Fallbacks
 Use real application data where expected. Verify derived values use correct records. Provide safe nullable handling, route/error boundaries where appropriate, loading/Suspense/empty states, retry actions, and graceful API failures. Never hide business errors behind misleading defaults.

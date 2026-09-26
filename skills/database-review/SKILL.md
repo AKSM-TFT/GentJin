@@ -47,3 +47,6 @@ For database, API, network, or external-service failures:
 ## Documentation
 
 Keep schema/query changes synchronized with relevant architecture, decisions, modules, patterns, bugs, or WIP notes when reusable knowledge changes.
+
+## Related Skills
+Keep query correctness, data integrity, schema behavior, query-level performance, migration safety, and read/write safety here. Use `backend-review` for handler and service concerns such as retries, idempotency, and resource cleanup; `performance-review` for cross-stack measurement and caching methodology; `dependency-review` for ORM or driver changes.
