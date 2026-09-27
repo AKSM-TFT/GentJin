@@ -1,0 +1,80 @@
+---
+name: project-conventions
+description: Learn an existing codebase before changing it, then match its conventions and reuse what already exists. MUST be used before implementing meaningful changes in an existing project, and when creating any component, route, endpoint, server function, hook, query, validation helper, or utility. Also use when new code could plausibly duplicate an existing implementation.
+---
+# Project Conventions
+
+## Learn Before Editing
+
+Do not start coding from generic framework preferences, personal style, framework defaults, or patterns from unrelated projects. Inspect the project first.
+
+Inspect enough of the codebase to answer:
+
+- What framework and runtime is this, and how is the repository organized?
+- Where do similar features live, and how are routes written?
+- How are components, hooks, and shared abstractions written?
+- How is server logic, data access, validation, and error handling done?
+- What naming, folder, import/export, and commenting conventions apply?
+- What tests exist and how are they structured?
+
+The target is that new code looks like it was written by the team that wrote the existing project.
+
+## Conventions Take Priority
+
+Project-local conventions are the default implementation standard: export style, function style, route/file/folder naming, early-return style, data-fetching pattern, API response format, database access pattern, validation placement, error handling, state management, component composition, hook naming, server/client separation, logging, styling, and test structure.
+
+Do not rewrite a consistent, valid project style into a generic best-practice style. Consistency with the existing codebase is part of correctness.
+
+Write human-readable code: descriptive names, straightforward control flow, minimal nesting, small focused functions, comments that explain why. Avoid clever one-liners, giant mixed-responsibility functions, magic values, and abstraction for its own sake.
+
+## Search Before Create
+
+Before creating any component, route, page, hook, server function, service, repository method, database query, mutation, form, schema, validation helper, utility, API wrapper, or data-access layer, search the codebase for an existing implementation that may already satisfy the requirement.
+
+When several comparable examples exist, inspect enough of them to identify the recurring convention rather than copying one unusual file. Prefer adapting an established pattern over inventing a new one.
+
+Reuse or extend a compatible implementation first. Create something new only when no suitable implementation exists, when existing behavior has materially different semantics, when reuse would break data correctness, when reuse would create harmful coupling, or when extension would make the existing abstraction confusing.
+
+Do not duplicate functionality because discovery was skipped.
+
+## Reuse Rules
+
+### Frontend components
+
+For visual or interactive work that introduces no new backend or persistence contract, search for an existing component first: buttons, inputs, selects, dropdowns, modals, dialogs, cards, tables, badges, tabs, form fields, date pickers, pagination, loading and empty states, confirmation dialogs, layout primitives.
+
+Inspect its props and usage, reuse it if it fits, extend it carefully when the requirement is a natural extension that will not break existing consumers, and create a new component only when the existing one cannot support the requirement cleanly. If two components differ only by text, icons, labels, or small visual variants, make the existing component reusable through props instead of duplicating it.
+
+Do not force reuse that would introduce confusing conditional behavior, mix unrelated responsibilities, couple unrelated features, change an existing component's meaning, or reduce clarity.
+
+### API and fetch logic
+
+Before creating an endpoint, API client function, fetch helper, request wrapper, or server function, search for an existing implementation of the same operation. Do not create `getUsers`, `fetchUsers`, `loadUsers`, `retrieveUsers`, and `getAllUsers` as separate functions for one operation; prefer one canonical implementation reused by callers.
+
+When behavior is close but not identical, first check whether it can be safely extended with optional parameters, filters, pagination, selected fields, or reusable inputs without breaking existing callers or creating an unclear contract. Create a new function only when the operation is genuinely different.
+
+### Database queries and data access
+
+Reuse an existing query, repository method, or data-access function when the purpose, filtering semantics, returned shape, authorization assumptions, and transaction requirements all match. Prefer extending the canonical query with optional filters, search, pagination, sorting, date range, or include flags over writing a parallel version.
+
+Do not force reuse when semantics differ materially, such as reusing a query scoped to active organization-visible records for an admin audit over all records including archived ones. Correct data semantics outrank reducing function count.
+
+When several parts of the project need the same data, prefer one canonical path — UI to shared hook/client/server function to service/repository/query to database — instead of each page or modal running its own fetch.
+
+## Reuse Must Not Corrupt Data Flow
+
+Before reusing a component, API function, fetch helper, or query, verify input requirements, output shape, validation behavior, authorization rules, mutation side effects, database writes, caching and invalidation behavior, transaction behavior, error handling, and caller expectations.
+
+If reuse would interfere with how data is transferred or persisted, keep the shared portion, isolate the genuinely different behavior, and create the smallest new abstraction necessary. Reuse shared behavior, not mismatched behavior.
+
+## Do Not Blindly Copy Bad Legacy Patterns
+
+Conventions are the default, but never copy code that is insecure, clearly broken, deprecated, causing the bug being fixed, contradicted by current project documentation, or incompatible with an explicit new requirement.
+
+When deviating: identify the reason, make the smallest safe deviation, stay consistent with surrounding architecture, avoid unrelated refactoring, and record the reason in project knowledge when it will matter later.
+
+## Persist Discovered Conventions
+
+When stable conventions are discovered that will matter in future work, persist them through `knowledge-vault` without waiting to be asked: routing, component structure, server-function patterns, database access style, error handling, validation, state management, folder and naming conventions, testing conventions, shared abstractions, and architectural boundaries.
+
+Prefer updating an existing project-conventions note over creating a duplicate. Verify stored conventions against current source when practical; current source is authoritative when a note is stale.

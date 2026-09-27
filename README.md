@@ -46,6 +46,10 @@ into focused skills that are activated when they are relevant.
 GENTJIN behaves as an orchestration layer rather than a folder of optional
 instructions. For meaningful work it:
 
+- inspects and learns an existing project before changing it, so new code
+  matches the conventions already in the repository instead of a generic style;
+- searches for an existing implementation before creating a component, route,
+  query, or helper, and reuses it unless that would break correctness;
 - infers which skills apply from the task itself, instead of waiting for a
   keyword or a named skill;
 - delegates independent, substantial workstreams to agents when that genuinely
@@ -58,6 +62,10 @@ instructions. For meaningful work it:
   locking in the first routing decision;
 - verifies before claiming success, and scales orchestration up with complexity
   and risk rather than running everything by default.
+
+For a new project with no established structure, the same layer establishes a
+framework-native, feature-oriented foundation first, so the first feature does
+not become the architecture for everything else.
 
 Explicit commands remain available for deterministic control. They are a manual
 override, not the only way the workflow runs.
@@ -118,16 +126,18 @@ permanent GENTJIN home at `<user-home>/.config/opencode/GentJin/`, preserve
 your existing setup, add only the required Knowledge Vault permission to the
 global configuration, and, with explicit approval, rename a legacy
 `Documents/ObsidianVault` folder to `Documents/KnowledgeVault` so Obsidian keeps
-pointing at the same vault. It backs up conflicts and verifies the installed
-files. Restart OpenCode when it finishes.
+pointing at the same vault. It refreshes the installed files in place, keeps no
+copies of them, and verifies the result. Restart OpenCode when it finishes.
 
 For path detection, conflict handling, updates, and troubleshooting, see
 [INSTALL.md](INSTALL.md).
 
 After a `git pull` brings in newer GENTJIN files, run `/update-gentjin` to bring
-the installed copy back in line. It uses the manifest to back up and refresh
-managed files, asks before replacing anything you modified yourself, and
-re-checks the Knowledge Vault permission.
+the installed copy back in line. It uses the manifest to refresh managed files,
+asks before replacing anything you modified yourself, and re-checks the
+Knowledge Vault permission. No backup copies are kept: the repository is the
+source of truth, and when the run finishes only the permanent home, the runtime
+view, and the manifest remain.
 
 ## Commands
 
@@ -157,7 +167,8 @@ of asking the agent to remember every rule at once.
 | Skill | Focus |
 | --- | --- |
 | `requirements-review` | Ambiguity, constraints, conflicts, and acceptance criteria before implementation. |
-| `architecture-review` | Structural changes, module boundaries, data flow, and migration paths. |
+| `architecture-review` | Structural changes, module boundaries, data flow, migration paths, and new-project scaffolding. |
+| `project-conventions` | Learn an existing codebase, follow its conventions, and reuse what already exists. |
 | `frontend-review` | Responsive UI, accessibility, UX states, and frontend performance. |
 | `backend-review` | Handlers, services, jobs, webhooks, async behavior, retries, and idempotency. |
 | `database-review` | Queries, data layers, performance, failures, and migration safety. |
@@ -182,6 +193,8 @@ of asking the agent to remember every rule at once.
 - Discover the project and its existing knowledge.
 - Check active WIP, open questions, and recent decisions.
 - Start from the current source code rather than assumptions.
+- Learn the existing conventions and search for an existing implementation
+  before creating anything new.
 - Use `requirements-review` and `architecture-review` when the request is
   ambiguous or the change is structural.
 
@@ -253,6 +266,7 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── integration-review/
 │   ├── knowledge-vault/
 │   ├── performance-review/
+│   ├── project-conventions/
 │   ├── reporting/
 │   ├── requirements-review/
 │   ├── review-orchestrator/
