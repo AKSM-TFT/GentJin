@@ -1,6 +1,6 @@
 ---
 name: cleanup
-description: Perform the user's full pre-main cleanup workflow. Use when the user says clean up/cleanup or asks for production-readiness QA of current changes. Reviews Git changes, debugs issues, runs tests/typecheck/lint/build when available, removes temporary/dead code, checks data/query/frontend/security quality, updates knowledge, and always finishes with a cleanup report.
+description: Finish and QA current implementation work before handoff, review, or merge. Use when the user asks to clean up, and also when work is being wrapped up or judged production-ready. Reviews the Git diff, runs the project's real tests/typecheck/lint/build, removes temporary and dead code, checks data/query/frontend/security quality, updates knowledge, and always finishes with a cleanup report.
 ---
 # Cleanup
 

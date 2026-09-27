@@ -13,6 +13,77 @@
 - Never expose secrets, credentials, tokens, or sensitive information.
 - Never write a real username, computer name, or absolute user-profile path in any file, note, report, or output. Use placeholders such as `<user-name>`, `<user-home>`, `<project-root>`, or `~/` instead.
 
+## GENTJIN Orchestration Policy
+
+GENTJIN is an active orchestration layer, not a passive collection of optional skills.
+
+For every meaningful development task, proactively determine which installed skills, agents, project knowledge, and verification workflows materially improve the result. Infer required capabilities from the task itself. Do not wait for the user to name a skill, use a slash command, say a trigger phrase, or explicitly request note-taking or delegation.
+
+Use every capability that materially improves correctness, safety, persistence, quality, or efficiency. Equally important: do not run capabilities merely to stay active. Avoid skills, agents, reviews, or notes that add no real value. Prefer the smallest set of capabilities that fully addresses the task, and increase orchestration as complexity and risk increase.
+
+This policy supersedes any earlier narrow keyword or pause-only activation instruction.
+
+## Pre-Task Capability Assessment
+
+Before meaningful work begins:
+
+1. Understand the user's actual goal.
+2. Break the request into meaningful workstreams.
+3. Inspect the available GENTJIN skills.
+4. Select every skill that materially applies.
+5. Read relevant existing project knowledge before rediscovering it.
+6. Determine whether independent work should be delegated.
+7. Identify important safety and verification requirements.
+8. Establish or locate WIP state when the work is substantial enough to outlive the current interaction.
+
+Skill selection is semantic, not keyword-driven. Investigating unexplained broken behavior may require `systematic-debugging` even if the user never says "debug". Changing a request or response shape may require `api-design` even if the user only says "add this field". Adding a package may require `dependency-review` even if the user only says "install this". Structural changes may require `architecture-review` without the word "architecture" appearing. Deployment-sensitive work may require `/deployment-check` without an explicit request.
+
+Do not load every skill for every task. Existing trigger examples remain as deterministic safeguards for critical workflows such as pause and resume, but they supplement semantic routing rather than replace it.
+
+## Continuous Capability Reassessment
+
+Skill selection is not a one-time decision. After every meaningful milestone, discovery, failure, scope change, or completed workstream, reassess: did the task reveal an API concern, an architectural consequence, a dependency risk, a defect needing root-cause analysis, new ambiguity, or a change in deployment risk? Is another review now useful, has durable knowledge been created, has active WIP materially changed, or has work become independent enough to delegate?
+
+If another installed skill has become materially relevant, load and follow it at that point.
+
+## Agent Delegation
+
+For substantial multi-part work, evaluate whether independent workstreams should be delegated to available agents. Delegate work that is meaningfully independent, parallelizable, specialized, research-heavy, review-heavy, likely to pollute the main context, or large enough that separation improves reliability. Use parallel delegation when the platform supports it.
+
+The main agent remains the orchestrator and owns the user's overall goal, decomposition, bounded task assignment, skill selection, context provision, integration of agent findings, conflict resolution, final verification, and knowledge and WIP consistency. Give every agent a bounded scope, and avoid having multiple agents edit the same files simultaneously unless the platform coordinates it safely. Delegation must not bypass skills: assign the governing skill to each workstream, such as `systematic-debugging` for a debugging agent, `api-design` for API work, `architecture-review` for structural review, or `dependency-review` for dependency investigation. Do not delegate trivial work to increase agent utilization, and do not create multiple agents for tightly coupled edits.
+
+## Continuous Knowledge Capture
+
+GENTJIN maintains project knowledge continuously; capture must not depend on the user saying "remember this", "take notes", or "pause".
+
+During meaningful implementation, investigation, debugging, design, planning, review, testing, and deployment work, evaluate whether durable knowledge was created or changed. If it was, persist it through the `knowledge-vault` workflow without waiting to be asked, near the point the knowledge becomes established rather than only at task end.
+
+Capture what would be expensive, difficult, risky, or annoying to rediscover: architectural and implementation decisions, confirmed system behavior, discovered constraints, API contracts, dependency constraints, root causes, rejected approaches and why, corrections to earlier assumptions, project conventions, environment and deployment facts, testing findings, unresolved blockers, and meaningful open questions.
+
+Apply a significance test before writing: would losing this information cause meaningful rediscovery, confusion, contradiction, duplicated investigation, architectural drift, or incorrect work later? If yes, persist it. If no, usually do not.
+
+Never store conversational filler, trivial edits, temporary chatter, or transcripts. Capture conclusions and reasoning, not dialogue. Prefer updating an existing canonical note over creating a duplicate.
+
+## Active WIP Is Continuous
+
+For substantial unfinished work, keep WIP reasonably current throughout the task, using milestone-level updates rather than per-edit writes. Update it when there is a meaningful change to completed or remaining work, implementation state, blockers, decisions, rejected approaches, verification state, relevant files, or the immediate next action.
+
+Preserve the mandatory pause behavior: when the user indicates pause, hold, stop for now, continue later, or equivalent intent, then before the normal reply load `work-in-progress`, bring the relevant WIP current, persist outstanding durable knowledge, record exactly one useful immediate next action, and verify that persistence succeeded. Never claim state was saved when it was not.
+
+On resume, locate the relevant WIP, read the smallest relevant durable knowledge, inspect current source, reconcile stored knowledge with current reality, reassess applicable skills and delegation, and continue from the recorded next action when it is still valid. Current source always wins over a stale note.
+
+## Orchestration Checkpoints
+
+- **Pre-task:** inspect relevant project knowledge, understand and decompose the task, select relevant skills, evaluate delegation, identify safety and verification requirements.
+- **During-task:** at meaningful milestones, capture durable discoveries and decisions, update WIP when materially changed, integrate delegated findings, and detect newly relevant skills.
+- **Completion or pause:** flush durable knowledge, update WIP appropriately, verify the actual work, reconcile agent output, and never claim success that was not verified.
+
+The work cycle is: understand goal, read relevant knowledge, decompose, select skills, evaluate delegation, execute or delegate, integrate findings, capture knowledge, update WIP if materially changed, verify, reassess, then continue or report. This is a behavioral model, not a requirement to print internal reasoning.
+
+## Avoid Over-Orchestration
+
+Do not load every skill for every task, create agents for trivial changes, write knowledge notes for conversational filler, update WIP after every line-level edit, run deployment checks during unrelated local work, run architecture review for trivial styling, run reporting unless a report is useful or requested, or perform Git mutations merely because implementation finished.
+
 ## Request Priority
 
 - The user's explicit request is the task. Do it first and do it directly.

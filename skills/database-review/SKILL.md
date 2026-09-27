@@ -1,6 +1,6 @@
 ---
 name: database-review
-description: Review database, query, API/server-function, loader/action, and data-layer changes for correctness, performance, authorization, connection failures, and migration safety. Use whenever database queries/schema/data access change or cleanup touches backend data flow.
+description: Review database, query, API/server-function, loader/action, and data-layer changes for correctness, performance, authorization, connection failures, and migration safety. MUST be used before creating or modifying schema or migrations, before any database write, and whenever queries, data access, or backend data flow change, including during cleanup.
 ---
 
 # Database Review
