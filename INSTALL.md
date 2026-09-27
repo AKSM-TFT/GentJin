@@ -154,7 +154,7 @@ Classify every destination file with this table:
 | Destination state | Action |
 | --- | --- |
 | Missing expected GENTJIN file | Install automatically; no prompt |
-| Manifest-managed and hash matches the recorded hash | Back up and update automatically; no prompt |
+| Manifest-managed and hash matches the recorded hash | Update automatically; no prompt |
 | Manifest-managed and hash differs | Treat as locally modified; ask before replacing |
 | Existing but not manifest-managed and byte-identical to source | Skip and leave unmanaged; no prompt |
 | Existing but not manifest-managed and different | Treat as user-owned or ambiguous; ask before replacing |
@@ -189,31 +189,16 @@ Do not read or print credentials. Never print, copy, or log unrelated
 configuration values; verify structure locally and report only the required
 permission state.
 
-### 2. Back up planned changes
+### 2. Keep no copies
 
-Before the first write, create a timestamped directory under the OpenCode root:
+Do not create backup or snapshot directories. Do not copy any file before
+replacing it. When the installation finishes, the only things that exist are the
+permanent home, the runtime view, and `install-manifest.json`.
 
-```text
-<opencode-root>/gentjin-backup/<yyyy-MM-dd-HHMMSS>/
-```
-
-Generate the timestamp from the current clock. Back up every existing file that
-will be replaced or automatically updated, preserving its layer and relative
-path:
-
-```text
-<backup>/permanent/AGENTS.md
-<backup>/runtime/AGENTS.md
-<backup>/runtime/command/cleanup.md
-<backup>/global/opencode.jsonc
-<backup>/obsidian/obsidian.json
-```
-
-Back up `<opencode-root>/opencode.jsonc` before an approved permission change.
-Back up Obsidian's saved vault registry before an approved vault-path change.
-Back up an existing `install-manifest.json` before replacing it. Do not back up
-identical files or unrelated files. If a backup fails, stop before changing
-either destination, the global configuration, or the vault path.
+GENTJIN payload files are always restorable from the source repository. For
+`<opencode-root>/opencode.jsonc` and Obsidian's saved vault registry, rely on the
+explicit approval step and the minimal targeted edit instead of a stored copy.
+Verify the result after the change rather than keeping a copy beforehand.
 
 ### 3. Populate the permanent home
 
@@ -221,7 +206,7 @@ Create `<gentjin-home>` if needed. Copy the approved source payload into it,
 preserving relative paths. Copy rather than move so the clone remains unchanged.
 
 Install missing source files automatically. Update unchanged manifest-managed
-permanent files automatically after backup. Ask only for the unsafe cases in the
+permanent files automatically. Ask only for the unsafe cases in the
 manifest table. Preserve unknown files already present in the permanent home.
 If a permanent source file is skipped, do not synchronize its runtime
 counterpart.
@@ -241,9 +226,9 @@ OpenCode root:
 <gentjin-home>/skills/**       -> <opencode-root>/skills/**
 ```
 
-Install missing runtime files automatically. Back up and update unchanged
-manifest-managed runtime files automatically. Ask before replacing locally
-modified, unmanaged, ambiguous, or otherwise unsafe files.
+Install missing runtime files automatically. Update unchanged manifest-managed
+runtime files automatically. Ask before replacing locally modified, unmanaged,
+ambiguous, or otherwise unsafe files.
 
 Preserve extra files in existing skill and command directories. Never remove
 unrelated files, plugins, settings, or configuration. The global
@@ -276,7 +261,7 @@ same installation.
 
 ### 6. Add the required global permission
 
-After both layers are populated and backed up, update
+After both layers are populated, update
 `<opencode-root>/opencode.jsonc` only when the preflight check shows the
 required permission is missing and the addition is safe under the rules above.
 
@@ -314,6 +299,7 @@ skills/git-workflow/SKILL.md
 skills/integration-review/SKILL.md
 skills/knowledge-vault/SKILL.md
 skills/performance-review/SKILL.md
+skills/project-conventions/SKILL.md
 skills/reporting/SKILL.md
 skills/requirements-review/SKILL.md
 skills/review-orchestrator/SKILL.md
@@ -356,10 +342,10 @@ The manifest is finalized only after the permanent and runtime files have been
 verified. If manifest creation fails, report the installation as incomplete.
 
 Print a concise summary containing the resolved permanent home, OpenCode root,
-installed skill and command counts, backup path (or `None`), the vault migration
-state (`renamed`, `already canonical`, or `skipped` after user approval), the
-global configuration permission state (`added`, `already present`, or `skipped`
-after user approval), and any skipped unsafe conflicts. End with:
+installed skill and command counts, the vault migration state (`renamed`,
+`already canonical`, or `skipped` after user approval), the global configuration
+permission state (`added`, `already present`, or `skipped` after user approval),
+and any skipped unsafe conflicts. End with:
 
 ```text
 Restart OpenCode to activate GENTJIN.

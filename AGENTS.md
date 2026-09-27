@@ -80,6 +80,19 @@ On resume, locate the relevant WIP, read the smallest relevant durable knowledge
 
 The work cycle is: understand goal, read relevant knowledge, decompose, select skills, evaluate delegation, execute or delegate, integrate findings, capture knowledge, update WIP if materially changed, verify, reassess, then continue or report. This is a behavioral model, not a requirement to print internal reasoning.
 
+## Codebase Learning and Standards
+
+- Learn an existing project before changing it. Inspect the root structure, the target file, nearby files in the same feature, and similar existing features to learn routing, naming, component structure, imports/exports, types, hooks, services, API and query patterns, validation, error handling, state management, styling, testing, and comment style. Do not code from generic framework preferences, personal style, or patterns from unrelated projects.
+- Project-local conventions are the default standard: export and function style, route/file/folder naming, early-return style, data-fetching pattern, API response format, database access, validation placement, error handling, state management, server/client separation, logging, and test structure. Do not rewrite a consistent project into a generic best-practice style. Consistency with the existing codebase is part of correctness.
+- Search before create. Before creating a component, route, page, hook, server function, service, repository method, query, mutation, form, schema, validation helper, or utility, search for an existing implementation and prefer reusing or safely extending it. Create something new only when no suitable implementation exists, when semantics materially differ, when reuse would break data correctness, or when extension would create harmful coupling. Do not duplicate functionality because discovery was skipped.
+- Reuse must never override correctness. Verify input requirements, output shape, validation, authorization, mutation side effects, caching and invalidation, transactions, and error handling before reusing a component, fetch helper, or query. Reuse shared behavior, not mismatched behavior.
+- Prefer one canonical data path (UI to shared hook/client/server function to service/repository/query to database) instead of per-page or per-modal custom fetches.
+- Do not blindly copy clearly harmful legacy patterns. When the surrounding code is insecure, broken, deprecated, or causes the bug being fixed, make the smallest safe deviation, keep the rest consistent, avoid unrelated migration, and record the reason in project knowledge.
+- For new projects with no established structure, establish a clean, framework-native, scalable foundation first: feature boundaries, server/client boundaries, shared-component strategy, data access, validation, types, testing, and configuration placement. Split features by responsibility, not line count. Do not let the first feature become the whole architecture, and do not create folders or abstractions without a real responsibility.
+- Keep generated code human-readable: descriptive names, straightforward control flow, minimal nesting, focused functions, and comments that explain why. Avoid clever one-liners, giant mixed-responsibility functions and components, magic values, and premature abstraction.
+- Persist stable discovered conventions through `knowledge-vault` without waiting to be asked, and verify stored conventions against current source when practical. Current source is authoritative when a note is stale.
+- Use `project-conventions` for existing-project learning and reuse discovery, and `architecture-review` for new-project scaffolding and structural risk.
+
 ## Avoid Over-Orchestration
 
 Do not load every skill for every task, create agents for trivial changes, write knowledge notes for conversational filler, update WIP after every line-level edit, run deployment checks during unrelated local work, run architecture review for trivial styling, run reporting unless a report is useful or requested, or perform Git mutations merely because implementation finished.
@@ -120,7 +133,7 @@ When the user asks to push to GitHub (or any remote):
 - GENTJIN installation may add only the required Knowledge Vault permission defined in INSTALL.md.
 - Never delete, disable, replace, reorder, or downgrade an existing configuration entry without explicit user approval.
 - Ask for explicit user approval before resolving any conflict with existing configuration.
-- Back up the global file before an approved change and verify that unrelated settings are preserved.
+- Make a minimal, targeted edit to the global file and verify afterward that unrelated settings are preserved, instead of storing a copy beforehand.
 
 ## Project Discovery
 
@@ -169,7 +182,8 @@ Use the appropriate skill when specialized work is required:
 
 Understand:
 - `requirements-review` - ambiguous requests, missing constraints, conflicts, and acceptance criteria.
-- `architecture-review` - subsystems, structural changes, boundaries, and migration paths.
+- `architecture-review` - subsystems, structural changes, boundaries, migration paths, and new-project scaffolding.
+- `project-conventions` - learn an existing codebase, match its conventions, and reuse what already exists before creating anything.
 
 Build and change:
 - `frontend-review` - responsive UI, UX, accessibility, optimistic UI, and frontend-specific performance.
