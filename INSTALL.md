@@ -12,25 +12,49 @@ installer script.
 
 ## Architecture
 
-Keep these locations separate:
+GENTJIN installs directly into OpenCode's native runtime directories. It never
+keeps a second copy of itself inside the OpenCode configuration directory.
 
 ```text
-<source-root>       The cloned GENTJIN repository
+<source-root>       Cloned or temporary GENTJIN source
 <opencode-root>     <user-home>/.config/opencode
-<gentjin-home>      <opencode-root>/GentJin
+<metadata-root>     <opencode-root>/.gentjin
 ```
 
-The permanent GENTJIN home contains the distributable source and reference
-files. OpenCode discovers the runtime view in the parent configuration root:
+Installation direction:
 
 ```text
-<opencode-root>/AGENTS.md
-<opencode-root>/command/
-<opencode-root>/skills/
+<source-root>/AGENTS.md    -> <opencode-root>/AGENTS.md
+<source-root>/command/**   -> <opencode-root>/command/**
+<source-root>/skills/**    -> <opencode-root>/skills/**
+installation metadata      -> <metadata-root>/manifest.json
+                             <metadata-root>/version.json
 ```
 
-The permanent home is the source of truth for future maintenance. The runtime
-files are synchronized copies.
+Expected end state of an installation:
+
+```text
+<opencode-root>/
+├── AGENTS.md
+├── command/
+├── skills/
+├── opencode.jsonc
+└── .gentjin/
+    ├── manifest.json
+    └── version.json
+```
+
+```md
+Do not create or retain a full GENTJIN source copy inside the OpenCode config
+directory.
+```
+
+`<opencode-root>/GentJin/` is retired. When it exists, migrate it as described in
+step 9 and then remove it.
+
+The repository is the source of truth. After installation the clone may be
+deleted. `README.md` and `INSTALL.md` are reference documents that live in the
+repository only; they are not installed.
 
 ## Resolve paths
 
@@ -39,8 +63,8 @@ directory without using a username or a path from the cloned repository:
 
 - Windows: use `$env:USERPROFILE`, or the platform user-profile API when it is
   unavailable.
-- macOS/Linux: use `$HOME`, or the operating system's user-home API when it is
-  unavailable.
+- macOS/Linux: use `$HOME`, or the operating system's operating-system API when
+  it is unavailable.
 - If the home directory cannot be resolved confidently, stop and ask the user
   without changing files.
 
@@ -48,46 +72,49 @@ Resolve:
 
 ```text
 <opencode-root> = <user-home>/.config/opencode
-<gentjin-home> = <opencode-root>/GentJin
+<metadata-root> = <opencode-root>/.gentjin
 ```
 
 Use the platform's native path separator. If `OPENCODE_CONFIG` or another
 setting points to a nonstandard configuration, report it and ask before using
 that location. Never install into a project-local configuration by accident.
 
-If either destination exists as a file instead of a directory, stop and report
-the conflict.
+If any destination exists as a file instead of a directory, stop and report the
+conflict.
 
 ## Resolve the source
 
-Start at the current working directory. Walk upward, if needed, to the nearest
-directory containing `AGENTS.md`, `command/`, and `skills/`. Stop if the source
-is ambiguous or incomplete.
+Prefer an existing GENTJIN checkout:
 
-If the source is already `<gentjin-home>`, use it as the source of truth. If the
-source is `<opencode-root>` but not `<gentjin-home>`, stop and ask before
-performing maintenance.
+1. The current working directory, when it is a GENTJIN source.
+2. The nearest ancestor directory containing `AGENTS.md`, `command/`, and
+   `skills/`.
+3. A GENTJIN checkout the user names.
 
-The source payload is:
+If none is available, create a temporary shallow checkout of the branch recorded
+in `<metadata-root>/manifest.json`, or the default branch when no metadata
+exists, inside a temporary directory. Remove that temporary checkout when the run
+finishes. Never keep it, and never place it inside `<opencode-root>`.
+
+Stop if the source is ambiguous or incomplete.
+
+The installable payload is:
 
 ```text
 AGENTS.md
-README.md
-INSTALL.md
 command/
 skills/
-LICENSE                 When present
 ```
 
-Preserve relative paths and additional files inside `command/` or `skills/`.
-Do not copy `.git/`, `node_modules/`, package metadata, temporary files,
-credentials, `.env` files, or generated caches into the permanent home.
+Preserve relative paths and additional files inside `command/` or `skills/`. Do
+not install `.git/`, `node_modules/`, package metadata, temporary files,
+credentials, `.env` files, generated caches, `README.md`, or `INSTALL.md`.
 
-Never copy the source `opencode.jsonc` into either destination. It is user
-configuration, not a GENTJIN payload. Preserve all providers, plugins,
-settings, permissions, MCP configuration, authentication data, and unrelated
-files in the user's global `opencode.jsonc`, except for the additive permission
-change defined below.
+Never copy the source `opencode.jsonc` into the destination. It is user
+configuration, not a GENTJIN payload. Preserve all providers, plugins, settings,
+permissions, MCP configuration, authentication data, and unrelated files in the
+user's global `opencode.jsonc`, except for the additive permission change defined
+below.
 
 ## Add the required global permission
 
@@ -122,32 +149,72 @@ Apply this rule only to `<opencode-root>/opencode.jsonc`:
 - If the global file is missing, stop and ask before creating it.
 - Read only the structure needed for this merge. Never print, copy, log, or
   record secrets, tokens, credentials, or unrelated configuration values.
-- Do not add `opencode.jsonc` to `install-manifest.json`; it remains
-  user-owned.
+- Do not add `opencode.jsonc` to the manifest; it remains user-owned. Record any
+  GENTJIN-required configuration state in `<metadata-root>/manifest.json` if it is
+  needed for a later update or uninstall.
 
 The addition must be idempotent. A repeated install or update must not create
 duplicate rules, reformat unrelated content, or rewrite the file when the
 permission already exists.
 
-## Use the manifest for ownership
+## Use the metadata for ownership
 
-`<gentjin-home>/install-manifest.json` is the GENTJIN ownership record. Create
-or update it after each successful installation. Do not list the manifest itself
-as a managed file.
+`<metadata-root>/manifest.json` is the GENTJIN ownership record. Create or
+update it after each successful installation or update. `<metadata-root>` holds
+metadata only; it must never contain `AGENTS.md`, `command/`, `skills/`,
+`README.md`, `INSTALL.md`, or any source checkout.
 
-Record, for every installed file:
+Recommended shape:
 
-- layer: `permanent` or `runtime`;
-- path relative to that layer;
-- SHA-256 hash captured after the successful install or update;
-- manifest format version and update timestamp.
+```json
+{
+  "formatVersion": 1,
+  "repository": "https://github.com/<owner>/<repo>",
+  "branch": "<branch>",
+  "installedCommit": "<commit>",
+  "installedAt": "<timestamp>",
+  "updatedAt": "<timestamp>",
+  "managedFiles": [
+    { "path": "AGENTS.md", "sha256": "<hash>" }
+  ]
+}
+```
 
-Use only relative managed paths in the manifest. Do not record credentials,
-repository-owner paths, machine names, usernames, or absolute user-profile
-paths. Refer to machine-specific locations with placeholders such as
-`<user-name>`, `<user-home>`, `<opencode-root>`, and `<project-root>`, or with
-`~/`. The user's own `opencode.jsonc` is never copied, so any real path inside it
-stays only in the user's file.
+`<metadata-root>/version.json` records the installed version:
+
+```json
+{
+  "version": "<version or commit>",
+  "branch": "<branch>",
+  "installedAt": "<timestamp>"
+}
+```
+
+`managedFiles` uses paths relative to `<opencode-root>` with forward slashes. Do
+not record credentials, repository-owner paths, machine names, usernames, or
+absolute user-profile paths. Refer to machine-specific locations with
+placeholders such as `<user-name>`, `<user-home>`, `<opencode-root>`, and
+`<project-root>`, or with `~/`. The user's own `opencode.jsonc` is never copied,
+so any real path inside it stays only in the user's file.
+
+Do not remove useful existing ownership or hashing safeguards when adopting this
+shape.
+
+Ownership rules:
+
+- A file listed in `managedFiles` is GENTJIN-owned.
+- A file under `command/` or `skills/` that is not listed is user-owned or
+  third-party. Never modify or delete it.
+- `AGENTS.md` is GENTJIN-managed when the manifest records it. When GENTJIN owns
+  the whole file, update it directly. When it merges into a user-authored file,
+  preserve the existing merge boundaries or markers and update only the
+  GENTJIN-owned section. Never create `.gentjin/AGENTS.md` or
+  `GentJin/AGENTS.md`; the active runtime file is always
+  `<opencode-root>/AGENTS.md`.
+- A file recorded as managed in a previous manifest but absent from the current
+  payload is a stale GENTJIN-owned file. Remove it only after the rules below
+  allow it, and never remove a similarly named file that the manifest does not
+  claim.
 
 Classify every destination file with this table:
 
@@ -156,13 +223,14 @@ Classify every destination file with this table:
 | Missing expected GENTJIN file | Install automatically; no prompt |
 | Manifest-managed and hash matches the recorded hash | Update automatically; no prompt |
 | Manifest-managed and hash differs | Treat as locally modified; ask before replacing |
-| Existing but not manifest-managed and byte-identical to source | Skip and leave unmanaged; no prompt |
+| Previously managed, no longer in the payload | Stale GENTJIN-owned file; remove when the table above allows |
+| Existing but not manifest-managed and byte-identical to source | Adopt as managed; no prompt |
 | Existing but not manifest-managed and different | Treat as user-owned or ambiguous; ask before replacing |
-| Invalid manifest, unreadable file, or file/directory type mismatch | Stop that path and ask |
+| Invalid metadata, unreadable file, or file/directory type mismatch | Stop that path and ask |
 
-Apply the same rules to `AGENTS.md`; it is not automatically user-owned. Batch
-all required confirmations into one concise request. Never prompt for missing
-files or unchanged manifest-managed files during a normal install or update.
+Batch all required confirmations into one concise request. Never prompt for
+missing files or unchanged manifest-managed files during a normal install or
+update.
 
 ## Install safely
 
@@ -170,20 +238,19 @@ files or unchanged manifest-managed files during a normal install or update.
 
 Before writing anything:
 
-1. Resolve the source, `<opencode-root>`, and `<gentjin-home>`.
-2. Read the existing manifest, if present.
-3. Enumerate the source payload directly; do not depend on a permanent-home copy
-   that may not exist yet.
-4. Compare source files directly with both permanent-home and runtime
-   destinations.
-5. Inspect only the minimum structure of `<opencode-root>/opencode.jsonc` needed
+1. Resolve `<source-root>`, `<opencode-root>`, and `<metadata-root>`.
+2. Read `<metadata-root>/manifest.json` and `version.json` if present.
+3. Detect a legacy installation at `<opencode-root>/GentJin/`.
+4. Enumerate the source payload directly.
+5. Compare source files directly with their runtime destinations.
+6. Inspect only the minimum structure of `<opencode-root>/opencode.jsonc` needed
    to determine whether the required permission is present, conflicting, or
    missing.
-6. Detect whether `<user-home>/Documents/ObsidianVault/` exists and
+7. Detect whether `<user-home>/Documents/ObsidianVault/` exists and
    `<user-home>/Documents/KnowledgeVault/` is absent. Do not open, merge, or
    delete vault contents during detection.
-7. Apply the manifest table above.
-8. Record unrelated existing files so they can be checked after installation.
+8. Apply the classification table above.
+9. Record unrelated existing files so they can be checked after installation.
 
 Do not read or print credentials. Never print, copy, or log unrelated
 configuration values; verify structure locally and report only the required
@@ -192,48 +259,40 @@ permission state.
 ### 2. Keep no copies
 
 Do not create backup or snapshot directories. Do not copy any file before
-replacing it. When the installation finishes, the only things that exist are the
-permanent home, the runtime view, and `install-manifest.json`.
+replacing it. When the run finishes, the only things that exist are the runtime
+files, `<metadata-root>`, and the user's own configuration.
 
 GENTJIN payload files are always restorable from the source repository. For
 `<opencode-root>/opencode.jsonc` and Obsidian's saved vault registry, rely on the
 explicit approval step and the minimal targeted edit instead of a stored copy.
 Verify the result after the change rather than keeping a copy beforehand.
 
-### 3. Populate the permanent home
+This runbook keeps no backups. Any earlier instruction to preserve or relocate
+backup storage is superseded.
 
-Create `<gentjin-home>` if needed. Copy the approved source payload into it,
-preserving relative paths. Copy rather than move so the clone remains unchanged.
+### 3. Install runtime files directly
 
-Install missing source files automatically. Update unchanged manifest-managed
-permanent files automatically. Ask only for the unsafe cases in the
-manifest table. Preserve unknown files already present in the permanent home.
-If a permanent source file is skipped, do not synchronize its runtime
-counterpart.
-
-Do not copy the source `opencode.jsonc`, dependency directories, package
-metadata, credentials, or generated caches. The additive permission change to
-the global configuration is a separate step below.
-
-### 4. Synchronize the runtime view
-
-After the permanent files are present, copy only the runtime payload into the
-OpenCode root:
+Copy the approved payload into OpenCode's native runtime paths:
 
 ```text
-<gentjin-home>/AGENTS.md       -> <opencode-root>/AGENTS.md
-<gentjin-home>/command/**      -> <opencode-root>/command/**
-<gentjin-home>/skills/**       -> <opencode-root>/skills/**
+<source-root>/AGENTS.md    -> <opencode-root>/AGENTS.md
+<source-root>/command/**   -> <opencode-root>/command/**
+<source-root>/skills/**    -> <opencode-root>/skills/**
 ```
 
-Install missing runtime files automatically. Update unchanged manifest-managed
-runtime files automatically. Ask before replacing locally modified, unmanaged,
-ambiguous, or otherwise unsafe files.
+Install missing files automatically. Update unchanged manifest-managed files
+automatically. Ask only for the unsafe cases in the classification table.
 
-Preserve extra files in existing skill and command directories. Never remove
-unrelated files, plugins, settings, or configuration. The global
-`opencode.jsonc` is not part of the runtime payload; change it only in the next
-step.
+Preserve extra files in existing `command/` and `skills/` directories. Never
+remove unrelated files, plugins, settings, or configuration. The global
+`opencode.jsonc` is not part of the payload; change it only in step 6.
+
+### 4. Remove stale GENTJIN-owned files
+
+For each path recorded in a previous manifest that the current payload no longer
+contains, remove it from the runtime only when it was manifest-managed with a
+matching hash or the user approved the replacement. Never remove a file the
+manifest does not claim, and never remove files outside the manifest.
 
 ### 5. Migrate the legacy Knowledge Vault path
 
@@ -257,13 +316,13 @@ request with the other install questions. Continue only after the user approves.
 
 If the user declines, leave the legacy path unchanged, record the migration as
 `skipped`, and continue. Never retry a skipped migration automatically in the
-same installation.
+same run.
 
 ### 6. Add the required global permission
 
-After both layers are populated, update
-`<opencode-root>/opencode.jsonc` only when the preflight check shows the
-required permission is missing and the addition is safe under the rules above.
+After the runtime files are installed, update `<opencode-root>/opencode.jsonc`
+only when the preflight check shows the required permission is missing and the
+addition is safe under the rules above.
 
 Use a minimal, targeted edit. Do not rewrite, reformat, or reserialize the whole
 file. Do not add the file to the manifest. If the preflight check found a
@@ -271,8 +330,7 @@ conflict, stop and ask instead of editing.
 
 ### 7. Verify the installation
 
-Verify every source payload file in the permanent home and every runtime file in
-the OpenCode root. At minimum, confirm:
+Verify every installed payload file against the source. At minimum, confirm:
 
 ```text
 AGENTS.md
@@ -319,37 +377,70 @@ Also confirm:
 - installed files match the source byte-for-byte;
 - unrelated files recorded during preflight still exist;
 - no unrelated skill, command, plugin, or configuration was removed;
-- the source `opencode.jsonc` was not copied into either layer;
+- the source `opencode.jsonc` was not installed;
 - the global `opencode.jsonc` contains the required permission, or was already
   correct and left unchanged;
 - every pre-existing global configuration entry is still present, and nothing
   was removed, replaced, reordered, or downgraded;
-- `opencode.jsonc` is not listed in `install-manifest.json`;
+- `opencode.jsonc` is not listed in the manifest;
 - the legacy vault was renamed only when approved, and its entry count and
   `.obsidian/` metadata were preserved;
 - Obsidian's saved path was updated only when approved, and the Obsidian
   application installation was not modified;
 - no credentials or environment values were read, printed, or written;
-- no temporary staging files remain.
+- no temporary source checkout or staging file remains.
 
-If verification fails, do not report success.
+If verification fails, do not report success and do not remove a legacy
+directory.
 
-### 8. Write the manifest last
+### 8. Write the metadata last
 
-After both layers verify successfully, create or update
-`<gentjin-home>/install-manifest.json` with the final hashes and managed paths.
-The manifest is finalized only after the permanent and runtime files have been
-verified. If manifest creation fails, report the installation as incomplete.
+After the runtime files verify successfully, write
+`<metadata-root>/manifest.json` and `<metadata-root>/version.json` with the final
+hashes, managed paths, repository, branch, installed commit, and timestamps. The
+metadata is finalized only after the runtime files have been verified. If
+metadata creation fails, report the installation as incomplete.
 
-Print a concise summary containing the resolved permanent home, OpenCode root,
-installed skill and command counts, the vault migration state (`renamed`,
-`already canonical`, or `skipped` after user approval), the global configuration
-permission state (`added`, `already present`, or `skipped` after user approval),
-and any skipped unsafe conflicts. End with:
+When the source is a Git checkout, record the current commit. When it is a
+temporary shallow checkout, record the resolved commit and the branch name.
 
-```text
-Restart OpenCode to activate GENTJIN.
+### 9. Retire a legacy installation
+
+Only after steps 1 through 8 succeed, and only when
+`<opencode-root>/GentJin/` exists:
+
+1. Inspect the legacy folder: its `install-manifest.json`, managed file
+   ownership, hashes, and timestamps.
+2. Confirm the active runtime already contains every required GENTJIN-managed
+   file, and that each matches the verified source. If any runtime file is
+   missing or stale, install it from the current source, verify it, and update
+   the ownership metadata first.
+3. Confirm no GENTJIN-managed runtime file is locally modified without the
+   required approval, and that unrelated files under `command/` or `skills/` are
+   untouched.
+4. Preserve the required metadata. Ownership, hashes, and the installed commit
+   are already in `<metadata-root>/manifest.json`; migrate anything still unique
+   to the legacy manifest. Do not copy the duplicated payload into
+   `<metadata-root>`.
+5. Only then remove `<opencode-root>/GentJin/` completely.
+
+Never recursively clean `<opencode-root>/skills/` or `<opencode-root>/command/`
+beyond manifest-owned stale files. Never delete custom user skills,
+third-party skills, custom commands, unrelated configuration, or unrelated
+`AGENTS.md` content.
+
+Report the legacy migration state as `retired` or `skipped`.
+
+## Migration safety invariant
+
+```md
+Never delete the legacy `<opencode-root>/GentJin/` directory until the new
+runtime state and metadata have both been successfully created and verified.
 ```
+
+Deletion is the final migration step. If the run is interrupted before
+verification, the legacy folder must still exist so the migration can be retried
+safely, and the failure must be reported clearly.
 
 ## Keep the Knowledge Vault canonical
 
@@ -361,8 +452,8 @@ user's home directory:
 ```
 
 Installation may rename the legacy `<user-home>/Documents/ObsidianVault/`
-directory to that canonical location only when the legacy directory exists,
-the canonical directory is absent, the user explicitly approves the rename, and
+directory to that canonical location only when the legacy directory exists, the
+canonical directory is absent, the user explicitly approves the rename, and
 Obsidian is closed. Never merge directories, delete vault content, or modify the
 Obsidian application installation. Update only Obsidian's saved vault path, and
 only when explicitly approved.
@@ -373,14 +464,27 @@ move, migrate, or delete any vault.
 
 ## Future maintenance
 
-The permanent home and `install-manifest.json` are sufficient for later update,
-repair, and uninstall workflows of GENTJIN-managed files. Re-run the additive
-global permission check on every update; the global `opencode.jsonc` remains
-user-owned and is not represented in the manifest. The vault migration is a
-one-time rename: after a successful migration, do not attempt it again, and if
-both the legacy and canonical paths exist, stop and ask. Do not implement
-maintenance workflows during this installation.
+`<metadata-root>/manifest.json` plus the repository source are sufficient for
+later update, repair, and uninstall workflows. No permanent local copy of the
+GENTJIN source is required or retained.
 
-When testing this runbook, use a temporary source and temporary OpenCode
+`/update-gentjin` must be sufficient for normal updates: detect a legacy
+installation, migrate metadata, reconcile runtime files, retire the legacy
+folder, retrieve the current source, update only GENTJIN-owned files, remove
+stale GENTJIN-owned files, preserve user-owned files, update
+`<metadata-root>/manifest.json` and `version.json`, and verify the result.
+
+Retrieve the current source from an existing GENTJIN checkout when one is
+available, otherwise from a temporary shallow checkout that is removed when the
+run finishes. Never require the user to keep a clone, and never recreate
+`<opencode-root>/GentJin/`.
+
+Re-run the additive global permission check on every update; the global
+`opencode.jsonc` remains user-owned and is not represented in the manifest. The
+vault migration is a one-time rename: after a successful migration, do not
+attempt it again, and if both the legacy and canonical paths exist, stop and ask.
+Do not implement maintenance workflows during an installation.
+
+When testing this runbook, use a temporary source and a temporary OpenCode
 configuration directory. Never test against the active user's global OpenCode
 configuration.

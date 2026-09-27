@@ -121,23 +121,37 @@ Then enter this command in OpenCode:
 Install GENTJIN by following INSTALL.md
 ```
 
-OpenCode will detect your operating system and configuration paths, create a
-permanent GENTJIN home at `<user-home>/.config/opencode/GentJin/`, preserve
-your existing setup, add only the required Knowledge Vault permission to the
-global configuration, and, with explicit approval, rename a legacy
-`Documents/ObsidianVault` folder to `Documents/KnowledgeVault` so Obsidian keeps
-pointing at the same vault. It refreshes the installed files in place, keeps no
-copies of them, and verifies the result. Restart OpenCode when it finishes.
+GENTJIN installs directly into OpenCode's existing runtime directories:
+
+- `<user-home>/.config/opencode/AGENTS.md`
+- `<user-home>/.config/opencode/command/`
+- `<user-home>/.config/opencode/skills/`
+
+GENTJIN keeps only lightweight installation metadata under:
+
+```text
+<user-home>/.config/opencode/.gentjin/
+```
+
+```text
+No duplicate GENTJIN source tree is retained after installation.
+```
+
+OpenCode detects your operating system and configuration paths, installs the
+runtime files in place, preserves your existing setup, adds only the required
+Knowledge Vault permission to the global configuration, and, with explicit
+approval, renames a legacy `Documents/ObsidianVault` folder to
+`Documents/KnowledgeVault` so Obsidian keeps pointing at the same vault. It
+keeps no copies of anything and verifies the result. Restart OpenCode when it
+finishes.
 
 For path detection, conflict handling, updates, and troubleshooting, see
 [INSTALL.md](INSTALL.md).
 
-After a `git pull` brings in newer GENTJIN files, run `/update-gentjin` to bring
-the installed copy back in line. It uses the manifest to refresh managed files,
-asks before replacing anything you modified yourself, and re-checks the
-Knowledge Vault permission. No backup copies are kept: the repository is the
-source of truth, and when the run finishes only the permanent home, the runtime
-view, and the manifest remain.
+The cloned repository is not required after a successful installation and can be
+deleted.
+
+Run `/update-gentjin` for normal updates. It uses `<user-home>/.config/opencode/.gentjin/manifest.json` to refresh only GENTJIN-owned files, asks before replacing anything you modified yourself, removes stale GENTJIN-owned files the repository no longer contains, preserves your own skills and commands, retires an old `<user-home>/.config/opencode/GentJin/` folder if one is present, and re-checks the Knowledge Vault permission. It retrieves the current source from an existing clone when one is available, otherwise from a temporary checkout that it removes afterwards. No backup copies are kept.
 
 ## Commands
 

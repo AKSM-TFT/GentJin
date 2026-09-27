@@ -1,13 +1,13 @@
 ---
-description: Install GENTJIN into the global OpenCode configuration by following INSTALL.md, with guarded vault migration and verification.
+description: Install GENTJIN directly into OpenCode's native runtime directories, with metadata-only tracking, guarded vault migration, and verification.
 ---
 
-Install GENTJIN by following `INSTALL.md` in the current repository.
+Perform a first-time installation of GENTJIN by following `INSTALL.md` in the current repository.
 
-Treat this as a first-time installation. Resolve the source repository, `<opencode-root>` (`<user-home>/.config/opencode`), and `<gentjin-home>` (`<opencode-root>/GentJin`) exactly as the runbook specifies, then execute every step in order: preflight, permanent home, runtime view, guarded legacy Knowledge Vault migration, additive global permission, verification, and the manifest. Keep no backup or snapshot copies of anything. When the run finishes, only the permanent home, the runtime view, and `install-manifest.json` should exist.
+Resolve the source repository, `<opencode-root>` (`<user-home>/.config/opencode`), and `<metadata-root>` (`<opencode-root>/.gentjin`) exactly as the runbook specifies, then execute every step in order: preflight, keep-no-copies, install runtime files directly, remove stale GENTJIN-owned files, guarded legacy Knowledge Vault migration, additive global permission, verification, metadata written last, and retirement of any legacy `<opencode-root>/GentJin/` directory.
 
-Do not improvise a shorter path. Never create `install.ps1`, `install.sh`, or another installer script, and never copy the source `opencode.jsonc`, dependency folders, package metadata, credentials, or generated caches. Never delete or weaken user-owned configuration; batch one concise approval request for any conflict.
+GENTJIN installs into `<opencode-root>/AGENTS.md`, `<opencode-root>/command/`, and `<opencode-root>/skills/`. It keeps only installation metadata under `<opencode-root>/.gentjin/`. Never create `<opencode-root>/GentJin/` and never retain a full GENTJIN source copy inside the OpenCode configuration directory. Keep no backup or snapshot copies of anything. When the run finishes, only the runtime files, `<opencode-root>/.gentjin/`, and the user's own configuration should exist.
 
-If a previous GENTJIN installation already exists, use `/update-gentjin` instead of restarting the architecture.
+If a GENTJIN installation already exists, use `/update-gentjin` instead of restarting the architecture.
 
-Print the runbook's final summary, including the permanent home, OpenCode root, installed skill and command counts, vault state, permission state, and skipped conflicts, then remind the user to restart OpenCode.
+Print the runbook's final summary, including the OpenCode root, metadata root, installed skill and command counts, legacy migration state, vault state, permission state, and skipped conflicts, then remind the user to restart OpenCode. Tell the user that the cloned repository can be deleted after a successful installation.
