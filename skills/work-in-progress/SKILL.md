@@ -1,6 +1,6 @@
 ---
 name: work-in-progress
-description: Preserve and resume unfinished development work. Use when work spans sessions, is blocked, is paused, the user says continue/resume/revisit, or meaningful implementation remains. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.
+description: Preserve and resume unfinished development work. MUST be used when the user pauses, holds, stops for now, or asks to continue previous work, and at meaningful milestones during substantial unfinished work, even without an explicit request. Use when work spans sessions, is blocked, or meaningful implementation remains. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.
 ---
 # Work in Progress
 

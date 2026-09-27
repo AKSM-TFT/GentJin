@@ -1,6 +1,6 @@
 ---
 name: git-workflow
-description: Handle guarded Git and source-control workflows. Use when inspecting repository status/history/diffs, creating branches or commits, pushing, merging, preparing pull requests, or when cleanup/reporting needs source-control evidence. Never performs mutating Git actions unless explicitly requested.
+description: Handle guarded Git and source-control workflows. MUST be used before any commit, branch creation, push, merge, rebase, or pull request. Use when inspecting repository status/history/diffs, matching repository commit and branch conventions, or when cleanup/reporting needs source-control evidence. Never performs mutating Git actions unless explicitly requested.
 ---
 # Git Workflow
 

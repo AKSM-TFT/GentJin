@@ -296,8 +296,10 @@ command/cleanup.md
 command/deployment-check.md
 command/git-push.md
 command/install-gentjin.md
+command/pause.md
 command/project-review.md
 command/report.md
+command/resume.md
 command/status.md
 command/task.md
 command/update-gentjin.md

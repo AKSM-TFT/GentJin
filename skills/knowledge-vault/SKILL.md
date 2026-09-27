@@ -1,6 +1,6 @@
 ---
 name: knowledge-vault
-description: Manage persistent project knowledge in the user's Knowledge Vault. Use for project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, reusable concepts and patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration of existing project knowledge. Also use for workflow memory: searching reusable task procedures before repeating a personal or project task, and capturing or updating a workflow note after a recurring task succeeds, or when the user says "remember this", "save this workflow", "how do I open or run X again", or "don't do that again".
+description: Manage persistent project knowledge in the user's Knowledge Vault, including project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration. MUST be used when durable knowledge is established during a task, even when the user never asks for notes, and when the user says "remember this", "save this workflow", or "don't do that again". Never store transcripts, secrets, or cheap-to-rediscover information.
 ---
 
 # Knowledge Vault

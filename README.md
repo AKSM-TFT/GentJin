@@ -31,13 +31,36 @@ into focused skills that are activated when they are relevant.
 | Everyday problem | GENTJIN response |
 | --- | --- |
 | One oversized instruction file | Modular skills with clear triggers |
-| Work disappears between sessions | WIP state and persistent knowledge |
+| Skills that only run when remembered | Semantic capability selection, not keyword matching |
+| Work disappears between sessions | Continuous knowledge capture and active WIP |
+| Long multi-part tasks | Bounded, skill-aware agent delegation |
 | “It looked done” | Cleanup, QA, and explicit verification |
 | Reviews happen too late | Read-only `/changes-review` and `/project-review` |
 | Risky defaults | Read-only data access and guarded Git actions |
 | Reports take too long | Consistent, evidence-based reporting |
 
 > **The goal:** make good engineering behavior easier to repeat, not harder to remember.
+
+## Orchestration
+
+GENTJIN behaves as an orchestration layer rather than a folder of optional
+instructions. For meaningful work it:
+
+- infers which skills apply from the task itself, instead of waiting for a
+  keyword or a named skill;
+- delegates independent, substantial workstreams to agents when that genuinely
+  helps, while the main agent stays the orchestrator;
+- captures durable project knowledge as decisions become established, gated by
+  a significance test so notes never become transcripts;
+- keeps WIP current during substantial unfinished work, and pauses and resumes
+  on plain language such as "hold on" or "let's continue";
+- reassesses skills, agents, and knowledge as the task evolves instead of
+  locking in the first routing decision;
+- verifies before claiming success, and scales orchestration up with complexity
+  and risk rather than running everything by default.
+
+Explicit commands remain available for deterministic control. They are a manual
+override, not the only way the workflow runs.
 
 ## Workflow at a glance
 
@@ -119,6 +142,8 @@ re-checks the Knowledge Vault permission.
 | `/deployment-check` | Analyze deployment readiness, report blockers and warnings, and suggest next steps without modifying the project until you approve. |
 | `/changes-review` | Review the current changes and their impact radius without modifying the project until you approve fixes. |
 | `/project-review` | After confirmation, perform a comprehensive read-only review of the entire relevant project and suggest improvements before any changes are made. |
+| `/pause` | Bring the active WIP current, flush durable knowledge, and record one next action. |
+| `/resume` | Reload the WIP and relevant knowledge, verify them against current source, and continue. |
 | `/git-push` | Commit and push the current changes on a new branch, asking for approval first. |
 
 Commands are intentionally short entry points into larger, repeatable
@@ -209,8 +234,10 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── deployment-check.md
 │   ├── git-push.md
 │   ├── install-gentjin.md
+│   ├── pause.md
 │   ├── project-review.md
 │   ├── report.md
+│   ├── resume.md
 │   ├── status.md
 │   ├── task.md
 │   └── update-gentjin.md
