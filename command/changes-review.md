@@ -17,9 +17,13 @@ Start from the current Git state:
 - new or untracked source files when relevant;
 - branch changes when needed to understand the work.
 
+Resolve the project, then load the relevant project memory (`project/overview.md`, `project/structure.md`, and the architecture or module notes for the changed area) before inspecting the diff. Project memory supplies context for the review: existing architecture, module conventions, expected data flow, known patterns, and recorded decisions. Verify it against current source, and treat current source as authoritative when they disagree.
+
 Then determine the impact radius. Do not inspect only changed lines. When a changed file depends on or affects another component, inspect enough surrounding code to verify the integration. For example, a change to a create action may also affect its schema, service, table, aggregation, authorization rules, and tests.
 
 If the directory is not a Git repository, state that the Git-based scope was skipped and review the current work instead.
+
+Keep the review scoped to the current changes. Do not turn it into a full project review; use `/project-review` for that.
 
 ## Read-only analysis
 

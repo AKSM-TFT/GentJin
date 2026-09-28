@@ -46,6 +46,22 @@ Do NOT read every file line by line. Skip or deprioritize:
 - generated route or type files unless relevant
 - lockfile internals unless dependency analysis requires them
 
+## Refresh project memory
+
+This command may validate and refresh project memory after the review, because it
+already inspects the whole project. Load `project/` memory, compare it against
+what the review actually found, and refresh only the canonical notes that are
+stale or missing: repository structure, stack, verified commands, and project
+state.
+
+- Create missing `project/` notes only for facts the review established.
+- Do not erase useful historical notes.
+- Do not dump findings into `project/`; that area describes the current known
+  state of the repository.
+- Record durable discoveries in their own areas: decisions in
+  `architecture/decisions/`, problems in `issues/`, and notable work in
+  `sessions/`.
+
 ## Read-only rule
 
 The entire initial `/project-review` is read-only. Use the same restrictions as `/changes-review`: inspect files, Git state, and related modules, and run safe tests, lint, typecheck, build, and non-destructive diagnostics when useful. Do not edit, create, delete, or format files, upgrade dependencies, change configuration, commit, push, merge, deploy, or mutate databases.

@@ -160,6 +160,44 @@ When the user asks to push to GitHub (or any remote):
 - Never create one permanent note per request. A note for every ask buries the few that matter and breaks retrieval.
 - Search before writing, then update the existing topic note rather than creating a duplicate.
 
+## Project Memory
+
+Recall first, verify second, explore only what is missing, update what changed.
+
+Each project vault may hold a `project/` area with `overview.md`, `structure.md`, `stack.md`, `commands.md`, and `state.md`. Before broadly exploring a project, resolve the knowledge root, check whether that memory exists, read only the notes relevant to the current task, and verify just the paths the task will touch.
+
+Re-explore an area only when a referenced path is gone, current source contradicts stored memory, the memory is insufficient, or the user asks for a fresh project-wide exploration. Do not re-discover the framework, re-map every directory, or re-read unrelated modules during ordinary feature work.
+
+Project memory is an optimization, never an authority. Precedence: current source/schema, then current project configuration, then verified project memory, then older notes. When memory conflicts with the code, trust the code and correct the memory. Update only the note whose durable content changed, reuse existing notes instead of creating near-duplicates, and never store unverified commands or invented structure.
+
+Create `project/` lazily on first use. Never force it on an existing vault, and never delete or overwrite existing notes to add it.
+
+## Continuity Memory
+
+OpenCode context is temporary; vault memory is durable. Never rely on conversation history or a compaction summary as the only record of meaningful knowledge.
+
+- Keep `work-in-progress/current.md` current as the single canonical answer to "what were we doing, where did we stop, what is next?". It holds the objective, status, completed, in progress, remaining, blockers, relevant files, related memory, and exactly one next recommended step. Clear or archive it when the work is finished rather than leaving a misleading resume point. Topic WIP notes may run alongside it for parallel workstreams.
+- Append meaningful continuity to `sessions/YYYY-MM-DD.md` for each day: what was worked on, meaningful changes, decisions, discoveries, problems and resolutions, remaining work, and the next step. Update that day's note rather than adding a second one, and never record every action, command, or message.
+- Use `changes/` for a meaningful completed change, recording date, branch, commit when known, reason, areas affected, and behavior before and after. Use `attempts/` for a rejected or failed approach worth remembering, with why it failed and what worked instead. Skip both for small edits.
+- Answer recall questions from ordinary conversation without requiring a command. Route by intent: current state to `work-in-progress/current.md`, "what happened" to `sessions/`, "what changed" to `changes/` plus Git, "why" to `architecture/decisions/`, "what went wrong before" to `attempts/` and `issues/`, "have we solved this" to `issues/` and `knowledge/`. Search the smallest relevant set first.
+- For a briefing, prefer a compact structure: latest work, completed, key decisions, issues and discoveries, still in progress, next recommended step. Do not fabricate empty sections, and never present an older session as current when Git or WIP shows newer work.
+- Use Git as supporting evidence for what changed, and the vault for the reasoning around it. Do not copy Git history into the vault.
+- Before a meaningful task is finished, check whether structure, architecture, a decision, a durable bug, a feature, current WIP, today's session, or a change note needs updating, and update only what applies.
+
+## Memory Retrieval
+
+Do not load everything the vault knows. Know what exists, load only what matters, verify it, then work.
+
+- Read the project's `memory-index.md` first when it exists; it lists canonical notes with one-line descriptions. Treat it as a catalog, not as content. Create it lazily, keep it bounded, and update only the entries whose note changed.
+- Retrieve because the memory matches the task: task relevance plus importance, recency when it matters, and relationship to the current module. Never load unrelated modules or history as a precaution.
+- Retrieve progressively and stop as soon as context is sufficient. Prefer, in order: current WIP, project overview/structure when needed, the exact module note, the exact decision/issue/attempt, the most recent relevant session, and broader history only if still necessary.
+- Use deterministic retrieval first: project identity, note titles, Obsidian links, module names, paths, and task terminology. Do not introduce embeddings, a vector store, or a database.
+- Record provenance and verification state on important canonical knowledge so it can be re-verified later.
+- When memory conflicts with the repository, source wins. Mark the situation `STALE`, `CONTRADICTED`, `AMBIGUOUS`, `UNVERIFIED`, or `HISTORICAL`, then correct the canonical note. Never leave two canonical notes contradicting each other, and never let stored memory override the code.
+- Answer "brief me before we start" with current objective, latest progress, important decisions, open issues and blockers, remaining work, and the recommended next step. Answer "wrap up today's work" as an end-of-day handoff.
+- Review memory occasionally for duplicates, orphans, broken links, and stale canonical notes. Cleanup is non-destructive by default: report and propose, do not delete.
+- Do not add memory-management slash commands. Prefer natural language.
+
 ## Workflow Memory
 
 - Before repeating a personal or project task that was likely done before, search `~/Documents/KnowledgeVault/gentjin/workflows/` for a matching workflow and reuse it instead of rediscovering the steps. Use `<project-knowledge-root>/workflows/` for project-specific workflows.
