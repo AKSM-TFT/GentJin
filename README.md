@@ -245,8 +245,10 @@ Run `/update-gentjin` for normal updates. It uses `<user-home>/.config/opencode/
 | --- | --- |
 | `/install-gentjin` | Install GENTJIN into your global OpenCode configuration. |
 | `/update-gentjin` | Update the installed GENTJIN copy from a newer repository state. |
+| `/revert-gentjin` | Revert the installed GENTJIN copy to a previous state, or remove one feature's command and skills (for example `/revert-gentjin refactor`). |
 | `/cleanup` | Finish current work with QA, cleanup, and a final report. |
 | `/report` | Turn the current work into a clear, evidence-based report. |
+| `/refactor` | Refactor a file or area into framework-native structure without changing behavior. |
 | `/status` | See the branch, pending changes, active WIP, and open questions. |
 | `/task` | Handle a general-purpose software or laptop task, with reusable workflow memory and `vscode` and `dev` branches. |
 | `/deployment-check` | Analyze deployment readiness, report blockers and warnings, and suggest next steps without modifying the project until you approve. |
@@ -274,6 +276,7 @@ of asking the agent to remember every rule at once.
 | `database-review` | Queries, data layers, performance, failures, and migration safety. |
 | `api-design` | Request/response contracts, validation, pagination, and versioning. |
 | `integration-review` | Defects at the seams between layers and systems. |
+| `refactoring` | Behavior-preserving splits into framework-native components, hooks, services, utils, and similar. |
 | `systematic-debugging` | Root-cause workflow for broken behavior and regressions. |
 | `test-strategy` | Risk-driven decisions about what to test and at which level. |
 | `security-review` | Authentication, authorization, secrets, input, and data integrity. |
@@ -351,8 +354,10 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── install-gentjin.md
 │   ├── pause.md
 │   ├── project-review.md
+│   ├── refactor.md
 │   ├── report.md
 │   ├── resume.md
+│   ├── revert-gentjin.md
 │   ├── status.md
 │   ├── task.md
 │   └── update-gentjin.md
@@ -369,6 +374,7 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── knowledge-vault/
 │   ├── performance-review/
 │   ├── project-conventions/
+│   ├── refactoring/
 │   ├── reporting/
 │   ├── requirements-review/
 │   ├── review-orchestrator/

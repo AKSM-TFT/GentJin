@@ -28,6 +28,18 @@ description: Manage persistent project knowledge in the user's Knowledge Vault, 
 
 5. Keep global GENTJIN configuration project-agnostic.
 
+6. Disambiguate same-name projects in different folders: after resolving the
+   knowledge root, compare the current project root against the known roots
+   recorded in `project/state.md`. If they differ and no `.project-agent.md`
+   override distinguishes this project, stop and ask which project the vault
+   belongs to instead of silently merging notes. When two projects share a
+   name, give each its own identity via `.project-agent.md`:
+
+   ```markdown
+   project_identifier: <unique-id>
+   knowledge_root: ~/Documents/KnowledgeVault/<unique-id>
+   ```
+
 ## Workflow Memory
 
 Use workflow memory for recurring commands, personal automation patterns, and repeatable computer tasks that are likely to be requested again. Keep cross-project workflows in the global GENTJIN workflow store and project-specific workflows in the current project vault.

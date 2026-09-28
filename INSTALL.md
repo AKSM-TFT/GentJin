@@ -341,8 +341,10 @@ command/git-push.md
 command/install-gentjin.md
 command/pause.md
 command/project-review.md
+command/refactor.md
 command/report.md
 command/resume.md
+command/revert-gentjin.md
 command/status.md
 command/task.md
 command/update-gentjin.md
@@ -358,6 +360,7 @@ skills/integration-review/SKILL.md
 skills/knowledge-vault/SKILL.md
 skills/performance-review/SKILL.md
 skills/project-conventions/SKILL.md
+skills/refactoring/SKILL.md
 skills/reporting/SKILL.md
 skills/requirements-review/SKILL.md
 skills/review-orchestrator/SKILL.md

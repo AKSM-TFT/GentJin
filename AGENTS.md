@@ -229,6 +229,7 @@ Build and change:
 - `database-review` - query/data-layer review, database safety, schema/migration safeguards, and data integrity.
 - `api-design` - request/response contracts, validation, status codes, pagination, and versioning.
 - `integration-review` - defects at layer boundaries such as frontend to API, service to database, or webhook to handler.
+- `refactoring` - behavior-preserving splits of mixed-responsibility code into framework-native components, hooks, services, utils, and similar.
 
 Diagnose:
 - `systematic-debugging` - root-cause workflow for broken behavior, failing builds or tests, and regressions.
