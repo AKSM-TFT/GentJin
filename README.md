@@ -70,6 +70,92 @@ not become the architecture for everything else.
 Explicit commands remain available for deterministic control. They are a manual
 override, not the only way the workflow runs.
 
+## Project memory
+
+GENTJIN keeps a small, durable understanding of each project so a later session
+does not rediscover what an earlier one already learned. Each project vault gets
+a `project/` area:
+
+```text
+project/
+├── overview.md    what this repository is
+├── structure.md   layout, directory responsibilities, relationships
+├── stack.md       verified runtime, frameworks, data layer, tooling
+├── commands.md    verified install, dev, build, test, lint, type-check
+└── state.md       identity, known roots, last verified revision
+```
+
+The behavior it enables:
+
+```text
+Recall first.
+Verify second.
+Explore only what is missing.
+Update what changed.
+```
+
+Project memory is an optimization, never an authority. Current source code and
+schema always win; when stored memory contradicts the repository, the code is
+believed and the memory is corrected. Each note carries a `Last verified`
+marker as a staleness hint, and those markers never trigger an automatic full
+rescan. Ordinary feature work reads only the notes it needs and updates only
+the note whose durable content changed.
+
+Existing vaults keep working. The `project/` area is created lazily, on first
+use, and no existing note is ever deleted or overwritten to add it. Project
+memory is not a copy of the repository, not a replacement for verifying code,
+not a conversation log, and not a reason to scan the whole project each time.
+
+## Continuity memory
+
+Context is temporary; the vault is durable. GENTJIN keeps enough state to answer
+ordinary questions about previous work without relying on the conversation:
+
+```text
+work-in-progress/current.md   where we stopped and what is next
+sessions/YYYY-MM-DD.md        what happened on a given day
+changes/                      a meaningful completed change, with reason
+attempts/                     a rejected approach, why it failed, what worked
+architecture/decisions/       why an important choice was made
+```
+
+That means these work in plain conversation, with no command:
+
+```text
+"Brief me."                    "Where did we stop?"
+"What did we do yesterday?"     "What is still unfinished?"
+"Continue what we were doing."  "Why did we do it this way?"
+"Didn't we try this before?"   "What changed this week?"
+```
+
+A briefing stays compact — latest work, completed, key decisions, issues and
+discoveries, still in progress, next recommended step — and never presents an
+older session as current when Git or WIP shows newer work. Git is evidence for
+what changed; the notes hold the reasoning. Compaction or a closed session does
+not lose the engineering state.
+
+## Memory retrieval
+
+Each vault keeps a small `memory-index.md` catalog: one line per topic, linking
+to the canonical note with a one-line description. It answers "what knowledge
+exists, and where is it?" without opening a single note, and never grows into a
+second copy of the documentation.
+
+Retrieval is relevance-gated and progressive. A request about one module does
+not pull in unrelated modules or old sessions. Memory loads in budgeted order —
+current WIP, project overview, the exact module note, the exact decision or
+issue, the most recent relevant session — and stops as soon as context is
+sufficient. Lookup is deterministic first: note titles, links, module names,
+paths, and task terminology. No embeddings, no vector store, no database.
+
+Important canonical notes record where they came from and when they were last
+verified. When memory disagrees with the repository, the code wins, the
+situation is marked `STALE`, `CONTRADICTED`, `AMBIGUOUS`, `UNVERIFIED`, or
+`HISTORICAL`, and the note is corrected. Two canonical notes never end up
+contradicting each other.
+
+"GentJin should become better at remembering without becoming heavier to use."
+
 ## Workflow at a glance
 
 ```text
@@ -206,6 +292,8 @@ of asking the agent to remember every rule at once.
 
 - Discover the project and its existing knowledge.
 - Check active WIP, open questions, and recent decisions.
+- Read the project's `project/` memory first, then verify only the paths the
+  task will touch.
 - Start from the current source code rather than assumptions.
 - Learn the existing conventions and search for an existing implementation
   before creating anything new.

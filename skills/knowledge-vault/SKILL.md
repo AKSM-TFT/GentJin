@@ -89,6 +89,14 @@ Do not create empty notes solely to populate directories.
 ```text
 <project-identifier>/
 ├── 00-Home.md
+├── memory-index.md
+│
+├── project/
+│   ├── overview.md
+│   ├── structure.md
+│   ├── stack.md
+│   ├── commands.md
+│   └── state.md
 │
 ├── architecture/
 │   ├── modules/
@@ -106,9 +114,12 @@ Do not create empty notes solely to populate directories.
 │       └── archive/
 │
 ├── work-in-progress/
+│   ├── current.md
 │   └── archive/
 │
 ├── sessions/
+├── changes/
+├── attempts/
 ├── reports/
 ├── workflows/
 └── _templates/
@@ -139,6 +150,364 @@ Prefer:
 Knowledge priority:
 
 `Current Source/Schema → Accepted ADRs → Architecture → Modules → Patterns → Concepts → Issue History → Active WIP → Questions → Sessions → Reports`
+
+## Project Memory
+
+`project/` answers "what is this repository?" so a later session does not
+rediscover structure, stack, and commands that are already known.
+
+| Note | Stores |
+| --- | --- |
+| `project/overview.md` | Name, type, repository, purpose, primary areas, important entry points |
+| `project/structure.md` | Repository layout, directory responsibilities, important relationships, relevant conventions |
+| `project/stack.md` | Verified runtime, frontend, backend, database, infrastructure, tooling |
+| `project/commands.md` | Verified install, development, build, test, lint, and type-check commands |
+| `project/state.md` | Project id, repository, default branch, detected files, known roots, last verified commit/branch, known uncertainty |
+
+Create `project/` lazily. When a project vault has no `project/`, create it on
+first use, and create only the notes that were actually established. Do not
+create it for every project automatically, and never delete or overwrite
+existing notes to add it.
+
+First-time exploration should be targeted and compact: purpose, stack, major
+roots, entry points, primary module relationships, and commands. Do not attempt
+to document every file.
+
+Store only verified content. Commands come from package files, scripts,
+documentation, or a successful run. Never invent commands or technologies.
+
+Each note starts with `Last verified: YYYY-MM-DD`. Add `Last verified commit:`
+and `Last verified branch:` in `project/state.md` when Git is available. These
+are staleness hints only and must never trigger an automatic full rescan.
+
+Keep `project/` describing the current known state. History belongs in
+`sessions/`, `issues/`, `reports/`, and `work-in-progress/archive/`.
+
+### Retrieving Project Memory
+
+Before broadly exploring a project:
+
+1. Resolve the current project knowledge root.
+2. Check whether `project/` already exists.
+3. Read only the notes relevant to the current task.
+4. Verify only the paths the task will touch.
+5. Update the note whose durable content changed, and nothing else.
+
+Re-explore an area only when a referenced path no longer exists, current source
+contradicts stored memory, the memory is insufficient for the task, or the user
+asks for a fresh project-wide exploration. Do not re-discover the framework,
+re-map every directory, or re-read unrelated modules during ordinary feature
+work.
+
+Reuse before creating. Update `project/structure.md` rather than adding
+`project-structure-2.md`, `project-structure-new.md`, or `structure-final.md`.
+
+Precedence when memory conflicts with reality:
+
+`Current source/schema → Current project configuration → Verified project memory → Older notes`
+
+Trust the current code, decide whether the memory is stale, then correct the
+memory when the new information is durable. Do not preserve an incorrect note
+merely because it already exists.
+
+## Memory Index
+
+Maintain a compact `memory-index.md` at the project vault root so a session can
+learn what knowledge exists without opening every note.
+
+Its only job is answering "what knowledge exists, and where is it?". One line
+per topic:
+
+```md
+# Memory Index
+
+Last updated: YYYY-MM-DD
+
+## Project
+
+- [[project/overview]] — project purpose and major areas
+- [[project/structure]] — repository structure
+- [[project/stack]] — technology stack
+- [[project/commands]] — verified project commands
+
+## Current Work
+
+- [[work-in-progress/current]] — where we stopped
+
+## Modules
+
+- [[architecture/modules/payables]] — Payables architecture
+- [[architecture/modules/authentication]] — authentication flow
+
+## Decisions
+
+- [[architecture/decisions/nullable-paid-date]]
+
+## Known Issues
+
+- [[issues/bugs/payables-timezone]]
+```
+
+Keep it bounded:
+
+```text
+Topic → canonical note → one-line description
+```
+
+Never put note contents, code examples, or history logs in the index. If the
+project outgrows one file, split into `indexes/<domain>.md` and link those from
+the root index, but only when that is actually needed. Do not create dozens of
+index files.
+
+Create the index lazily. A vault without one keeps working; create it when
+enough canonical knowledge exists to be worth indexing, and never require a
+destructive migration.
+
+Update an index entry when a note's title, location, or meaning changes, and
+remove references that no longer resolve. Do not rebuild the whole index on
+every change.
+
+## Retrieval Pipeline
+
+Use this order for ordinary work:
+
+```text
+User request
+      ↓
+Resolve project
+      ↓
+Read memory-index.md
+      ↓
+Determine intent, module, and time scope
+      ↓
+Select relevant memories
+      ↓
+Load the smallest useful set
+      ↓
+Verify against current source when needed
+      ↓
+Perform the work
+      ↓
+Capture durable changes
+      ↓
+Update the index if the knowledge map changed
+```
+
+This replaces broad vault scanning during normal tasks.
+
+### Relevance-Gated Retrieval
+
+Retrieve memory because it matches the task, not because it exists:
+
+```text
+Task relevance
+  + importance
+  + recency when it matters
+  + relationship to the current module
+  = what should be loaded
+```
+
+A request about one module must not pull in unrelated modules, sessions, or
+history. Relevance still matters even for the most important knowledge: do not
+load everything marked important on every request.
+
+### Progressive Retrieval
+
+Load one step at a time and stop as soon as context is sufficient:
+
+```text
+1. read the index
+2. read the matching module or feature note
+   enough? → work
+   not enough → read the related decision, issue, or attempt
+   still not enough → search the relevant session history
+```
+
+Stop retrieving once sufficient context exists. Do not load ten notes when two
+would do.
+
+### Retrieval Budget
+
+Prefer this order, and stop early:
+
+```text
+1. work-in-progress/current.md when relevant
+2. project overview and structure when needed
+3. the exact module or feature note
+4. the exact decision, issue, or attempt
+5. the most recent relevant session
+6. broader history only if still necessary
+```
+
+### Deterministic Retrieval First
+
+Start with what is already in the project: project identity, note titles,
+Obsidian links, module names, paths, task terminology, and the index
+descriptions. Do not introduce embeddings, a vector store, a database, an
+external memory service, or a background indexing process. Consider semantic
+retrieval only if Markdown-based retrieval proves insufficient in practice.
+
+### Hot and Cold Memory
+
+Temperature is retrieval behavior, not a folder. "Hot" knowledge is what the
+current task needs now: current objective, current WIP, project overview,
+current task and branch, blockers, the next step, and a recently relevant
+module. "Cold" knowledge stays available but is not loaded automatically: old
+sessions, resolved bugs, historical changes, superseded decisions, and old
+attempts.
+
+Never keep two copies of a note, such as a hot and a cold version of the same
+topic. Express temperature through retrieval order and the index, and reuse
+existing canonical files such as `work-in-progress/current.md` and
+`project/overview.md` instead of creating files that exist only to be "hot".
+
+### Avoiding Memory Explosion
+
+Before creating a note, check whether it will help future work, whether it is
+durable, whether a canonical note already covers it, whether it is really
+history rather than current knowledge, and whether it could be a small update
+to an existing note instead.
+
+Prefer updating a canonical note over producing a new file. Create a note for
+every event and the vault stops being searchable.
+
+### Graph Quality
+
+Link notes when the relationship is genuinely useful, such as
+`[[Payables]]` → `[[Overdue Cron]]` → `[[Payables Timezone Bug]]` →
+`[[Nullable Paid Date Decision]]`. Do not link every note to every other note.
+The graph should be navigable along real engineering relationships, not dense
+for its own sake.
+
+### Provenance and Verification State
+
+Record where important canonical knowledge came from, so it can be re-verified
+later:
+
+```md
+## Provenance
+
+Verified from:
+
+- `src/services/payables.service.ts`
+- `src/jobs/payables-reminder.ts`
+
+Branch: HC-713-payables
+Commit: abc123
+```
+
+Alongside provenance, record verification state where staleness matters:
+
+```md
+Last verified: YYYY-MM-DD
+Verified against: current source
+Branch: development
+Commit: abc123
+```
+
+Focus this on canonical knowledge. Do not require it on historical session
+notes.
+
+## Conflicts and Authority
+
+When stored memory disagrees with the repository, never silently trust it:
+
+```text
+Conflict detected
+      ↓
+Current source wins
+      ↓
+Decide whether the source is the intended current behavior
+      ↓
+Update the canonical memory
+      ↓
+Preserve the historical explanation when useful
+```
+
+Mark the situation with a simple textual marker rather than building a state
+machine:
+
+| Marker | Meaning |
+| --- | --- |
+| `STALE` | Memory describes an older version of the project |
+| `CONTRADICTED` | Current source directly disagrees with memory |
+| `AMBIGUOUS` | Multiple current implementations appear to exist |
+| `UNVERIFIED` | Memory exists but cannot currently be confirmed |
+| `HISTORICAL` | Intentionally old, retained for recall |
+
+Do not leave two canonical notes making contradictory claims.
+
+Authority order:
+
+```text
+Current source/schema/configuration
+      ↓
+Current verified project state
+      ↓
+Canonical memory
+      ↓
+Historical memory
+      ↓
+Old session context
+```
+
+An explicit current requirement from the user may supersede a previously stored
+design decision. When that happens, implement the requirement and then update
+the stored decision so memory does not contradict the code.
+
+## Briefings and Handoffs
+
+### Start of Day
+
+For "brief me before we start", "what's going on with this project?", "what
+were we doing?", or "give me today's starting context", retrieve the project
+overview, current WIP, the latest relevant session, recent meaningful changes,
+and known blockers, then answer with:
+
+```text
+Current Objective
+Latest Progress
+Important Decisions
+Open Issues / Blockers
+Remaining Work
+Recommended Next Step
+```
+
+Keep it concise unless detail is requested, and do not rescan the repository.
+
+### End of Day
+
+For "wrap up today's work", "give me an end-of-day handoff", or "save where we
+stopped":
+
+1. inspect today's meaningful work;
+2. update `sessions/YYYY-MM-DD.md`;
+3. update `work-in-progress/current.md`;
+4. update canonical knowledge when durable facts changed;
+5. record blockers;
+6. record the next step;
+7. include relevant Git context when useful;
+8. return a short handoff summary.
+
+The handoff must make tomorrow's resume easy. Keep this state current during
+milestones as well, so compaction, a closed terminal, or an interruption never
+loses the engineering state.
+
+## Memory Cleanup
+
+Occasionally review the vault for:
+
+- duplicate notes;
+- orphaned notes;
+- broken links;
+- stale canonical notes;
+- several notes describing the same concept;
+- repeated session discoveries that belong in one canonical note;
+- superseded information that should be archived or marked `HISTORICAL`.
+
+Cleanup is non-destructive by default. Report what you found and propose the
+change; do not delete potentially useful knowledge on your own initiative. Do
+not archive a note merely because it is old.
 
 ## Knowledge Routing
 
@@ -233,19 +602,169 @@ Move completed or abandoned WIP notes to:
 
 when historical context remains useful.
 
+Maintain `work-in-progress/current.md` as the single canonical answer to "what
+were we doing, where did we stop, and what is next?". Keep it small: objective,
+current status, completed, in progress, remaining, blockers, relevant files,
+links to related memory, and one exact next recommended step. It may link to
+topic WIP notes when several workstreams run in parallel.
+
+When work is genuinely finished, clear or archive the active state instead of
+leaving a misleading `current.md` behind.
+
+## Recall and Briefings
+
+Recognize recall intent from ordinary conversation. The user should not need a
+command to ask about previous work.
+
+```text
+Recall request
+      ↓
+Resolve project
+      ↓
+Determine the requested time or scope
+      ↓
+Search the smallest relevant set
+      ↓
+Verify current state when it affects the answer
+      ↓
+Return a concise briefing
+```
+
+Route questions by intent:
+
+| Question | Look in |
+| --- | --- |
+| What is this project? | `project/` |
+| How does this work? | `architecture/`, `knowledge/` |
+| Why did we do this? | `architecture/decisions/` |
+| What happened yesterday? | `sessions/` |
+| What changed? | `changes/`, `sessions/`, Git |
+| Where did we stop? | `work-in-progress/current.md`, latest session |
+| What went wrong before? | `attempts/`, `issues/` |
+| Have we solved this before? | `issues/`, `knowledge/`, relevant sessions |
+| Continue our work. | `current.md`, latest session, related canonical memory |
+| What is left? | `current.md` |
+| What have we done this week? | `sessions/`, `changes/` |
+
+Search the smallest relevant set first, then widen only if the answer is
+incomplete.
+
+### Briefing Format
+
+For a general briefing, prefer a compact structure and adapt it to what actually
+exists:
+
+```text
+Latest Work
+Completed
+Key Decisions
+Issues / Discoveries
+Still In Progress
+Next Recommended Step
+```
+
+Do not fabricate empty sections. For a simple history question, answer directly
+instead of forcing the full format. Never dump raw notes unless asked.
+
+### Latest Changes
+
+For "brief me on the last changes", prefer current WIP, then the latest session
+note, then change memory, then Git context, then relevant canonical notes.
+Distinguish completed, in progress, unfinished, decisions, and the next step.
+Do not present an old session as current when Git or `current.md` clearly shows
+newer work.
+
+### Time and Timeline
+
+For relative questions such as "yesterday", "this week", or "last Friday", use
+dated session and change notes plus Git metadata, and interpret relative dates
+against the current local date. When nothing was recorded for the exact day, say
+so and surface the nearest relevant session rather than inventing activity.
+
+Compose timeline briefings from `sessions/`, `changes/`, `architecture/decisions/`,
+`issues/`, and Git. Do not maintain separate weekly or monthly notes unless they
+add real value.
+
+### Resume and Continue
+
+When the user says "continue", "let's continue yesterday's work", or similar:
+
+1. resolve the project;
+2. read `work-in-progress/current.md`;
+3. read the latest relevant session;
+4. retrieve the relevant canonical project or feature memory;
+5. verify the current repository state;
+6. briefly state the continuation point when useful;
+7. continue the work.
+
+Do not broadly rediscover the project first.
+
 ### Sessions
 
-Use `sessions/` only when historical development context is useful beyond active WIP.
+Use `sessions/` to answer "what happened while we worked on this project?".
 
-Do not save full conversations or transcripts.
+Create `sessions/YYYY-MM-DD.md` for meaningful work on a given date. When more
+work happens on the same date, update that day's note instead of creating a
+second note.
 
-Prefer concise summaries containing:
+Do not record every action, tool call, terminal command, file read, or
+conversation message. Capture only continuity information:
 
-- goal
-- meaningful changes
-- discoveries
-- unresolved items
-- relevant links
+- features or areas worked on;
+- meaningful changes;
+- important files involved;
+- discoveries and architectural findings;
+- decisions;
+- problems encountered and solutions applied;
+- failed approaches worth remembering;
+- completed work, unfinished work, blockers, and next steps.
+
+A session note is a historical record. It is not the current state of the
+project; that lives in `project/`, `architecture/`, and `knowledge/`.
+
+### Change Memory
+
+Use `changes/` for a meaningful completed change: feature behavior, refactor,
+migration, or integration change likely to matter later.
+
+Do not create a change note for a small edit. One note covers one coherent
+change, and it should record date, branch, and commit when Git information is
+available, plus the summary, reason, areas affected, important files, and the
+behavior before and after.
+
+Change notes answer "what materially changed, and what did it replace?".
+
+### Failed Attempts
+
+Use `attempts/` when a rejected or failed approach is worth remembering because
+recalling it would prevent repeated wasted work.
+
+Capture meaningful failures only: a rejected architecture, an incompatible
+library, an incorrect query strategy, a deployment method that failed durably,
+or a fix attempt that caused a regression. For each, record what was tried, what
+happened, why it failed, what worked instead, and when to avoid repeating it.
+
+Do not log every failed command. A failed command with no durable lesson does
+not belong here.
+
+### Feature Memory
+
+Treat a significant feature or domain as a concept, not only a folder of files.
+Keep its note in `knowledge/concepts/` and link it to the parts it spans:
+
+```text
+[[Feature]]
+├── [[Feature API]]
+├── [[Feature Schema]]
+├── [[Feature Jobs]]
+├── [[Feature Integrations]]
+├── [[Decisions]]
+├── [[Known Issues]]
+└── [[Changes]]
+```
+
+Do not force a feature note for small functionality. Use this for meaningful
+project domains only.
 
 ### Reports
 
@@ -334,9 +853,23 @@ Context
 Decision
 Reasoning
 Alternatives
+Tradeoffs Accepted
 Consequences
 Related
 ```
+
+A decision note must answer five questions:
+
+```text
+What was decided?
+Why?
+What alternatives were considered?
+What tradeoff was accepted?
+Is the decision still current?
+```
+
+`Status` answers the last question. When the accepted tradeoff is itself
+disputed later, record that in a new decision rather than rewriting the old one.
 
 Supported statuses should include:
 
@@ -366,12 +899,48 @@ Keep it concise.
 
 It may link to:
 
+- project memory
 - architecture overview
 - major modules
 - important ADRs
 - active WIP
 - important project concepts
 - current investigations
+
+When project memory exists, link it from the home note:
+
+```text
+## Project Memory
+
+- [[project/overview]]
+- [[project/structure]]
+- [[project/stack]]
+- [[project/commands]]
+- [[project/state]]
+```
+
+When continuity memory exists, link it too:
+
+```text
+## Current Work
+
+- [[work-in-progress/current]]
+
+## Recent Sessions
+
+- [[sessions/YYYY-MM-DD]]
+
+## Recent Changes
+
+- [[changes/...]]
+```
+
+Link `memory-index.md` as the entry point for discovering what knowledge exists.
+When the index is scoped into `indexes/`, link those from it rather than from
+the home note.
+
+Keep the index maintainable. Do not append an unlimited number of session links
+without a sensible recent/history organization.
 
 Do not turn `00-Home.md` into a duplicate of the entire vault.
 
@@ -381,15 +950,203 @@ Use `_templates/` for reusable note structures when templates materially improve
 
 Templates may exist for:
 
+- project memory notes
+- the memory index
 - ADRs
 - bugs
 - enhancements
 - questions
 - WIP
 - sessions
+- changes
+- attempts
 - reports
 
 Do not require every note to use a template when a simpler note is sufficient.
+
+Suggested memory index shape:
+
+```text
+# Memory Index
+
+Last updated: YYYY-MM-DD
+
+## Project
+- [[note]] — one-line description
+
+## Current Work
+## Modules
+## Decisions
+## Known Issues
+```
+
+Suggested start-of-day briefing shape:
+
+```text
+Current Objective
+Latest Progress
+Important Decisions
+Open Issues / Blockers
+Remaining Work
+Recommended Next Step
+```
+
+Suggested continuity note shapes:
+
+```text
+# Development Session — YYYY-MM-DD
+
+## Worked On
+## Meaningful Changes
+## Decisions
+## Discoveries
+## Problems Encountered
+## Resolutions
+## Remaining
+## Next Step
+## Git Context
+```
+
+```text
+# Current Work
+
+Last updated: YYYY-MM-DD HH:MM
+
+## Objective
+## Current Status
+## Completed
+## In Progress
+## Remaining
+## Blockers
+## Relevant Files
+## Relevant Memory
+## Next Recommended Step
+```
+
+```text
+# Change — <Title>
+
+Date:
+Branch:
+Commit:
+
+## Summary
+## Reason
+## Areas Affected
+## Important Files
+## Behavior Before
+## Behavior After
+## Related
+```
+
+```text
+# Attempt — <Title>
+
+## Attempt
+## Result
+## Why It Failed
+## Resolution
+## Avoid Repeating When
+```
+
+Suggested project memory note shapes:
+
+```text
+# Project Overview
+
+Last verified: YYYY-MM-DD
+
+## Project
+
+Name:
+Type:
+Repository:
+
+## Purpose
+
+What this project does.
+
+## Primary Areas
+
+- Area
+
+## Important Entry Points
+
+- path
+
+## Notes
+
+Important project-wide context.
+```
+
+```text
+# Project Structure
+
+Last verified: YYYY-MM-DD
+
+## Repository Layout
+
+## Directory Responsibilities
+
+### path/
+
+Purpose.
+
+## Important Relationships
+
+## Relevant Conventions
+```
+
+```text
+# Project Stack
+
+Last verified: YYYY-MM-DD
+
+## Runtime
+## Frontend
+## Backend
+## Database
+## Infrastructure
+## Tooling
+```
+
+```text
+# Project Commands
+
+Last verified: YYYY-MM-DD
+
+## Install
+## Development
+## Build
+## Test
+## Lint
+## Type Check
+```
+
+```text
+# Project State
+
+Last explored: YYYY-MM-DD
+
+## Identity
+
+Project ID:
+Repository:
+Default branch:
+
+## Detected Files
+
+## Known Roots
+
+## Last Verified Revision
+
+Commit:
+Branch:
+
+## Notes
+
+Known structural uncertainty or stale areas.
+```
 
 ## Vault Migration and Normalization
 
@@ -444,6 +1201,48 @@ After meaningful development work:
 Do not update the vault merely to record that files were edited.
 
 Capture the **reason, behavior, decision, or reusable lesson**, not a duplicate Git history.
+
+## Consolidation and Durability
+
+When a session discovers durable knowledge, decide whether it is canonical:
+
+```text
+Session discovery
+      ↓
+Durable?
+      ├── no  → leave it in the session note only
+      └── yes → update the canonical note, keep the session as history
+```
+
+Do not require a future session to search months of daily notes to learn the
+current architecture.
+
+Never rely on conversation history or on a compaction summary as the only record
+of meaningful knowledge. Persist engineering meaning during normal work, keep
+`current.md` current enough to resume interrupted work, and update the daily
+session note at meaningful milestones. Recover the engineering state, not every
+keystroke.
+
+Use Git as supporting evidence: repository, branch, commit, and changed files
+give the "what changed on this branch" answers. Notes supply the reasoning
+around those changes. Do not copy Git history into the vault.
+
+## Completion Checkpoint
+
+Before a meaningful task is considered finished, evaluate:
+
+```text
+Did project structure change?
+Did architecture change?
+Was a decision made?
+Was a durable bug learned?
+Was a meaningful feature changed?
+Did current WIP change?
+Should today's session note be updated?
+Is a change note warranted?
+```
+
+Update only the notes that apply.
 
 ## Quality Rules
 
