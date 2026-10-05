@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentjin.local/schemas/task-event.schema.json",
+  "title": "GENTJIN Task Event",
+  "description": "One append-only trace record. Serialized one JSON object per line to a JSONL file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "task_id",
+    "project_id",
+    "timestamp",
+    "phase",
+    "event_type",
+    "source"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "event_id": { "type": "string", "pattern": "^evt-[0-9a-f]{12}$" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+
+    "session_id": {
+      "type": ["string", "null"],
+      "description": "OpenCode session identifier when the event came from the runtime."
+    },
+    "parent_event_id": { "type": ["string", "null"] },
+    "span_id": { "type": ["string", "null"] },
+
+    "timestamp": { "type": "string", "format": "date-time" },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "observe",
+        "retrieve",
+        "plan",
+        "act",
+        "verify",
+        "reflect",
+        "store"
+      ]
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "task.started",
+        "task.state_changed",
+        "memory.retrieved",
+        "plan.recorded",
+        "skill.selected",
+        "routing.inferred",
+        "action.executed",
+        "action.failed",
+        "attempt.recorded",
+        "file.changed",
+        "verification.evidence",
+        "validation.evaluated",
+        "completion.blocked",
+        "task.finished",
+        "runtime.event"
+      ]
+    },
+
+    "skill": { "type": ["string", "null"] },
+    "tool": { "type": ["string", "null"] },
+
+    "outcome": {
+      "type": "string",
+      "enum": ["ok", "error", "skipped", "blocked", "unknown"],
+      "description": "'unknown' is required rather than a default of 'ok' when an outcome was not observed."
+    },
+
+    "duration_ms": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "Measured by the runtime or the plugin. Never estimated."
+    },
+
+    "evidence_reference": { "type": ["string", "null"] },
+    "error_category": { "type": ["string", "null"] },
+    "exit_code": {
+      "type": ["integer", "null"],
+      "description": "Real exit code from a command. Absent or null means it was not observed."
+    },
+
+    "source": {
+      "type": "string",
+      "enum": ["observed", "asserted"],
+      "description": "'observed' means the runtime reported it. 'asserted' means a human or the model claimed it."
+    },
+
+    "payload": {
+      "type": ["object", "null"],
+      "description": "Redacted, bounded detail. Raw prompt or tool payloads are not stored by default."
+    },
+
+    "payload_truncated": {
+      "type": "boolean",
+      "description": "True when payload exceeded the retention bound and was cut."
+    },
+
+    "usage": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "input_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "output_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "cost_usd": { "type": ["number", "null"], "minimum": 0 },
+        "model": { "type": ["string", "null"] },
+        "provider": { "type": ["string", "null"] },
+        "provenance": { "type": "string", "minLength": 1 }
+      },
+      "description": "Populated only from real usage data. Absent means unavailable, never zero."
+    },
+
+    "instrumentation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "hook": { "type": ["string", "null"] },
+        "captured_fields": { "type": "array", "items": { "type": "string" } },
+        "missing_fields": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

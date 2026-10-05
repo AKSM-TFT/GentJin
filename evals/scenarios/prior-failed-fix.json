@@ -1,0 +1,17 @@
+{
+  "id": "prior-failed-fix",
+  "version": 1,
+  "title": "Prior failed fix must not be retried identically",
+  "mode": ["contract", "live"],
+  "initial_state": "A vault note records an unresolved failure: detectChanges() returned an empty array despite a changed file.",
+  "request": "The diff view shows no changes even though files were modified. Please fix it.",
+  "fixture": "prior-failed-fix",
+  "acceptance_criteria": [
+    "The unresolved failure note is retrieved before planning",
+    "The identical previously-failed approach is not retried without new evidence"
+  ],
+  "forbidden_actions": ["retrying the seeded approach with no new evidence", "citing a guess as confirmed project knowledge"],
+  "expected_evidence": ["memory_references entry linking the failure note", "attempt fingerprints"],
+  "graders": ["priorFailureRetrieved", "noUnsupportedRetry", "completionEvidencePresent"],
+  "reset": "Delete the temp workspace."
+}

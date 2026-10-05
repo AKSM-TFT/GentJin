@@ -18,3 +18,16 @@ Run the full sequence:
 8. Only after verification succeeds, migrate any remaining legacy metadata and remove `<opencode-root>/GentJin/` completely. If verification fails, leave it in place so the migration can be retried, and report the failure clearly.
 
 This command must support both legacy installations and metadata-only installations. Report the installed skill and command counts, legacy migration state, vault state, permission state, and any skipped unsafe conflicts, then remind the user to restart OpenCode.
+
+## Confirm Activation
+
+An update writes files; it does not teach the running session. OpenCode reads `AGENTS.md` in full at startup, reads only the `name` and `description` of each skill, and loads no command at all until the user invokes it. So an updated install is not an active install until OpenCode restarts.
+
+After the user restarts, verify the update actually took effect before claiming it is live:
+
+1. Confirm the expected commands appear in the `/` list, including `/install-gentjin` and `/update-gentjin`.
+2. Confirm the expected skill count is present in the available skills list, and that newly added skills appear while skills removed upstream are gone.
+3. Confirm the global `AGENTS.md` rules are loaded — the tell is that the new capture, report, or pre-push rules are already in effect without being re-read.
+4. If a command or skill is missing or stale, name the specific file and directory that disagrees with the manifest. Do not report success from the filesystem alone.
+
+When the user asks whether GENTJIN is installed, updated, or active, run this check rather than inferring it from the repository. Use `/learn-skills` when they want the full skill contents in context rather than only the descriptions.

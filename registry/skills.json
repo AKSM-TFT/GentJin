@@ -1,0 +1,754 @@
+{
+  "schema_version": 1,
+  "generated_from": "skills/*/SKILL.md frontmatter",
+  "generated_by": "scripts/build-registry.mjs",
+  "routing_observability": {
+    "basis": "inferred",
+    "reason": "Skill selection fires no OpenCode hook. Routing is inferred from which SKILL.md files are read via read tool calls and must never be reported as observed."
+  },
+  "capabilities": {
+    "read/search": {
+      "tools": [
+        "read",
+        "glob",
+        "grep"
+      ],
+      "mutating": false,
+      "requires_approval": false,
+      "records": "action.executed"
+    },
+    "diff inspection": {
+      "tools": [
+        "bash"
+      ],
+      "mutating": false,
+      "requires_approval": false,
+      "records": "action.executed",
+      "note": "Read-only git commands only. Any mutating git command is out of contract."
+    },
+    "local edits": {
+      "tools": [
+        "edit",
+        "write"
+      ],
+      "mutating": true,
+      "requires_approval": false,
+      "records": "file.changed",
+      "note": "Scoped to task.scope.allowed_paths."
+    },
+    "verification commands": {
+      "tools": [
+        "bash"
+      ],
+      "mutating": false,
+      "requires_approval": false,
+      "records": "verification.evidence",
+      "note": "Exit code is the evidence. Never assert a result without one."
+    },
+    "read-only database inspection": {
+      "tools": [
+        "bash"
+      ],
+      "mutating": false,
+      "requires_approval": false,
+      "records": "action.executed",
+      "note": "SELECT only. Any mutation verb is a scope violation."
+    },
+    "reporting": {
+      "tools": [
+        "edit",
+        "write"
+      ],
+      "mutating": true,
+      "requires_approval": false,
+      "records": "task.finished"
+    }
+  },
+  "forbidden": [
+    {
+      "capability": "external write",
+      "reason": "Not part of any GENTJIN contract. Requires separate authorization."
+    },
+    {
+      "capability": "destructive filesystem operation",
+      "reason": "Never authorized by a skill selection."
+    },
+    {
+      "capability": "database mutation",
+      "reason": "Read-only by default. Requires explicit authorization."
+    },
+    {
+      "capability": "git push or history rewrite",
+      "reason": "Requires explicit user request."
+    },
+    {
+      "capability": "deployment",
+      "reason": "Requires explicit authorization."
+    },
+    {
+      "capability": "credential read",
+      "reason": "Secrets are never read into context or traces."
+    }
+  ],
+  "skills": [
+    {
+      "skill": "api-design",
+      "version": 1,
+      "description": "Review or design stable API contracts. Use when creating a new API, changing an existing contract, designing server/client interaction, adding pagination, filtering, or sorting, exposing an integration endpoint, or changing webhook and API behavior.",
+      "triggers": [
+        "endpoint",
+        "contract",
+        "pagination",
+        "request shape",
+        "response shape",
+        "versioning"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/api-design/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "architecture-review",
+      "version": 1,
+      "description": "Analyze significant cross-module or process-level structural changes before implementing them. Use when adding a subsystem, redesigning a major flow, changing authentication architecture, introducing workers/queues/background services, integrating an external provider, creating shared infrastructure, changing module boundaries or communication, scaffolding a new project or its first feature, or when the user asks how something should be built. Not for matching or reusing existing code patterns within a known structure; use `project-conventions` for that.",
+      "triggers": [
+        "architecture",
+        "subsystem",
+        "boundary",
+        "migration path",
+        "redesign",
+        "scaffold"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/architecture-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "backend-review",
+      "version": 1,
+      "description": "Review server-side logic that is not purely database or security work. Use for API handlers, server functions, services, jobs, workers, event processing, webhooks, background tasks, external-service integrations, and business-logic changes.",
+      "triggers": [
+        "handler",
+        "service",
+        "job",
+        "worker",
+        "webhook",
+        "queue",
+        "retry",
+        "idempotency"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/backend-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "cleanup",
+      "version": 1,
+      "description": "Finish and QA current implementation work before handoff, review, or merge. Use when the user asks to clean up, and also when work is being wrapped up or judged production-ready. Reviews the Git diff, runs the project's real tests/typecheck/lint/build, removes temporary and dead code, checks data/query/frontend/security quality, updates knowledge, and always finishes with a cleanup report.",
+      "triggers": [
+        "clean up",
+        "before merge",
+        "production ready",
+        "dead code",
+        "leftover debug"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/cleanup/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "compaction",
+      "version": 1,
+      "description": "Condense older conversation and work context into a small, accurate working summary when context grows large. MUST be used when repeated discussion, obsolete reasoning, explored-and-discarded paths, or topic drift obscure the current goal, before a pause, or when rebuilding context after interruption. Cooperates with work-in-progress for unfinished task state and knowledge-vault for durable knowledge; never replaces either or stores permanent truth.",
+      "triggers": [
+        "context too large",
+        "condense",
+        "summarize context",
+        "topic drift"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/compaction/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "database-review",
+      "version": 1,
+      "description": "Review database, query, schema, migration, and data-layer changes for correctness, query-level performance, authorization, data integrity, and connection failures. MUST be used before creating or modifying schema or migrations, before any database write, and whenever queries or data access change, including during cleanup. Not for handler, service, job, retry, or idempotency concerns; use `backend-review` for those.",
+      "triggers": [
+        "sql",
+        "schema",
+        "query",
+        "migration",
+        "index",
+        "data integrity"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/database-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "dependency-review",
+      "version": 1,
+      "description": "Safely evaluate dependency additions, upgrades, and replacements. Use when adding a package, upgrading dependencies, replacing a library, responding to an audit finding, or changing framework and runtime versions.",
+      "triggers": [
+        "add a package",
+        "upgrade dependency",
+        "replace library",
+        "audit finding",
+        "npm audit"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/dependency-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "deployment-readiness",
+      "version": 1,
+      "description": "Assess whether a project is safe to ship to production. Use when the user asks about deployment, release, production readiness, going live, launch safety, environment or config parity, CI/CD pipelines, rollback plans, migration safety before shipping, or secret and credential exposure. Also use when release or deployment-sensitive work is being finished. Delegate per-layer code correctness to the review skills; this skill owns the ship-readiness question.",
+      "triggers": [
+        "deploy",
+        "release",
+        "production",
+        "rollout",
+        "rollback",
+        "go live",
+        "readiness"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/deployment-readiness/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "frontend-review",
+      "version": 1,
+      "description": "Review changed frontend/UI code for responsive design, UX consistency, accessibility, optimistic interactions, loading/error/empty states, real data usage, and frontend performance. Use for UI changes, frontend QA, responsive/mobile review, or as part of cleanup when user-facing screens changed.",
+      "triggers": [
+        "ui",
+        "responsive",
+        "accessibility",
+        "a11y",
+        "render",
+        "layout",
+        "component",
+        "css"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/frontend-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "git-workflow",
+      "version": 1,
+      "description": "Handle guarded Git and source-control workflows. MUST be used before any commit, branch creation, push, merge, rebase, or pull request. Use when inspecting repository status/history/diffs, matching repository commit and branch conventions, or when cleanup/reporting needs source-control evidence. Never performs mutating Git actions unless explicitly requested.",
+      "triggers": [
+        "commit",
+        "branch",
+        "push",
+        "merge",
+        "git status",
+        "diff review"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/git-workflow/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "incident-response",
+      "version": 1,
+      "description": "Diagnose and resolve production incidents where users are already affected. Use when something is broken in production, error rates spiked, an outage or degraded service is reported, a deploy went wrong, customers report failures, or the user asks to roll back, hotfix, or restore service. Pairs with systematic-debugging for the root cause but owns the live-impact and mitigation path.",
+      "triggers": [
+        "outage",
+        "incident",
+        "down",
+        "production broken",
+        "latency spike",
+        "error rate"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/incident-response/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "integration-review",
+      "version": 1,
+      "description": "Catch defects that appear where two or more layers meet, which per-layer review misses. Use when a change crosses boundaries such as frontend to API, API to service, service to database, auth to route authorization, webhook to database, worker to API, payment provider to frontend, or any external provider to internal state.",
+      "triggers": [
+        "boundary",
+        "integration",
+        "cross-layer",
+        "api to db",
+        "webhook to"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/integration-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "knowledge-vault",
+      "version": 1,
+      "description": "Manage persistent project knowledge in the user's Knowledge Vault, including project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration. MUST be used when durable knowledge is established during a task, even when the user never asks for notes, and when the user says \"remember this\", \"save this workflow\", or \"don't do that again\". This is a core GENTJIN system, not an optional extra: prefer capturing a useful note over skipping one. Never store transcripts, secrets, or cheap-to-rediscover information.",
+      "triggers": [
+        "remember",
+        "knowledge",
+        "vault",
+        "note",
+        "what did we decide",
+        "prior session"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/knowledge-vault/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "performance-review",
+      "version": 1,
+      "description": "Find real performance problems using measurement instead of speculation. Use when performance is reported as an issue, the user asks for optimization, a review spots potentially expensive behavior, or a change is suspected of causing a measurable slowdown. Owns cross-stack methodology for caching, N+1 behavior, and resource leaks; use `frontend-review` for render performance and `database-review` for query cost.",
+      "triggers": [
+        "slow",
+        "latency",
+        "throughput",
+        "n+1",
+        "memory leak",
+        "optimize",
+        "benchmark"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/performance-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "project-conventions",
+      "version": 1,
+      "description": "Learn an existing codebase before changing it, then match its conventions, write human-readable self-documenting code without added comments, and reuse what already exists. MUST be used before implementing meaningful changes in an existing project, and when creating any component, route, endpoint, server function, hook, query, validation helper, or utility. Also use when new code could plausibly duplicate an existing implementation.",
+      "triggers": [
+        "existing codebase",
+        "match conventions",
+        "reuse existing",
+        "codebase learning"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/project-conventions/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "refactoring-migration",
+      "version": 1,
+      "description": "Execute a large-scale refactor, migration, or architecture change safely across an existing codebase. Use when changing a data shape, moving a service or module, dual-writing, expand-contract, introducing or retiring a feature flag, deprecating an API or table, backfilling data, strangler-fig transitions, or changing a contract that existing consumers depend on. Owns the staged execution path; use architecture-review for the design decision and project-conventions for matching existing style.",
+      "triggers": [
+        "refactor",
+        "migrate",
+        "expand-contract",
+        "dual-write",
+        "backfill",
+        "deprecate"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/refactoring-migration/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "reporting",
+      "version": 1,
+      "description": "Create project change, implementation, QA, debug, review, or cleanup reports. Use when the user asks create/write/generate/prepare a report, document changes, summarize implementation changes, or when cleanup requires its mandatory final report. Uses Git/session/vault evidence and produces a vault report plus concise console report.",
+      "triggers": [
+        "report",
+        "write up",
+        "change summary",
+        "document changes"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/reporting/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "requirements-review",
+      "version": 1,
+      "description": "Clarify ambiguous requests, missing constraints, conflicting rules, and acceptance criteria before implementation. Use when a feature request is vague, business rules are incomplete, more than one interpretation is genuinely plausible, or implementation would require guessing a decision that changes the result. Not for ordinary requests that are already clear enough to build.",
+      "triggers": [
+        "ambiguous",
+        "unclear requirement",
+        "acceptance criteria",
+        "conflicting"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/requirements-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "review-orchestrator",
+      "version": 1,
+      "description": "Shared comprehensive review engine for the review commands. Use when `/changes-review` or `/project-review` is invoked, or when the user explicitly asks for a full multi-layer or whole-codebase review, to map scope, delegate to the relevant specialized skills, and produce one evidence-based report. Not for single-file or single-layer review; use the specific review skill directly.",
+      "triggers": [
+        "full review",
+        "whole codebase",
+        "comprehensive review",
+        "changes review"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/review-orchestrator/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "security-review",
+      "version": 1,
+      "description": "Review changed code for application security and data-integrity risks. Use for authentication, authorization, user-owned records, external input, secrets/tokens, sensitive logs, mutations, payments, permissions, downloaded/untrusted code, or cleanup of security-sensitive changes.",
+      "triggers": [
+        "auth",
+        "authz",
+        "secret",
+        "token",
+        "credential",
+        "injection",
+        "pii",
+        "permission"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/security-review/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "systematic-debugging",
+      "version": 1,
+      "description": "Find the root cause of a defect with a disciplined reproduce-to-evidence-to-hypothesis-to-fix workflow. Use when something is broken, behavior is unexpected, a build or test suddenly fails, a regression is reported, data reaches the wrong process/session/component, the user asks \"why is this happening?\", or several attempted fixes have already failed.",
+      "triggers": [
+        "bug",
+        "broken",
+        "regression",
+        "not working",
+        "why is this happening",
+        "fails"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/systematic-debugging/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "test-strategy",
+      "version": 1,
+      "description": "Decide what should be tested and at which level before or during implementation. Use when implementing a meaningful feature, creating or changing tests, touching payment/auth/data-integrity logic, when a review finds insufficient verification, or when the user asks what needs testing. For an unexplained failure or regression, load `systematic-debugging` first to find the cause, then this skill to cover the fix.",
+      "triggers": [
+        "test coverage",
+        "what to test",
+        "regression test",
+        "test level"
+      ],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "required_verification": [
+        "review findings reference concrete files and lines"
+      ],
+      "review_only": true,
+      "grants_code_change_authority": false,
+      "path": "skills/test-strategy/SKILL.md",
+      "has_description": true
+    },
+    {
+      "skill": "work-in-progress",
+      "version": 1,
+      "description": "Preserve and resume unfinished development work. MUST be used when the user pauses, holds, stops for now, or asks to continue previous work, and at meaningful milestones during substantial unfinished work, even without an explicit request. Use when work spans sessions, is blocked, or meaningful implementation remains. This is a core GENTJIN system, not an optional extra: keep the active state current rather than reconstructing it later. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.",
+      "triggers": [
+        "pause",
+        "stop for now",
+        "continue later",
+        "resume",
+        "checkpoint",
+        "unfinished"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/work-in-progress/SKILL.md",
+      "has_description": true
+    }
+  ]
+}

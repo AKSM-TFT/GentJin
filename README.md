@@ -265,6 +265,7 @@ Run `/update-gentjin` for normal updates. It uses `<user-home>/.config/opencode/
 | --- | --- |
 | `/install-gentjin` | Install GENTJIN into your global OpenCode configuration. |
 | `/update-gentjin` | Update the installed GENTJIN copy from a newer repository state. |
+| `/learn-skills` | Load the full text of every installed skill into context for routing questions and corpus audits. |
 | `/cleanup` | Finish current work with QA, cleanup, and a final report. |
 | `/report` | Turn the current work into a clear, evidence-based report. |
 | `/status` | See the branch, pending changes, active WIP, and open questions. |
@@ -393,6 +394,7 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── deployment-check.md
 │   ├── git-push.md
 │   ├── install-gentjin.md
+│   ├── learn-skills.md
 │   ├── pause.md
 │   ├── project-review.md
 │   ├── report.md
@@ -424,8 +426,42 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── systematic-debugging/
 │   ├── test-strategy/
 │   └── work-in-progress/
+├── schemas/                   Portable JSON Schema contracts
+│   ├── task-record.schema.json
+│   └── task-event.schema.json
+├── src/                       Enforcement layer (Node 24, zero dependencies)
+│   ├── schema/validate.mjs    JSON Schema subset validator
+│   ├── task/record.mjs        Lifecycle, states, action capture
+│   ├── task/completion-gate.mjs
+│   ├── routing/route.mjs      Routing, scope and capability contracts
+│   ├── memory/failure-awareness.mjs
+│   └── trace/writer.mjs       JSONL traces, redaction, coverage
+├── registry/skills.json       Generated skill and capability registry
+├── plugins/gentjin-trace.mjs  Trace plugin using real OpenCode hooks
+├── scripts/build-registry.mjs
+├── evals/                     Executable evaluation suite
+│   ├── run.mjs                Contract and live modes
+│   ├── cases.mjs
+│   ├── graders/index.mjs
+│   ├── scenarios/             11 scenario definitions
+│   └── fixtures/              Synthetic, non-secret data only
+├── test/                      88 unit and contract tests
+├── docs/
+│   ├── architecture.md
+│   └── deferred.md
 └── opencode.jsonc            Local OpenCode configuration (not installed)
 ```
+
+## Verifying an installation
+
+```bash
+node --test "test/**/*.test.mjs"   # 88 tests
+node evals/run.mjs                 # contract evaluation, deterministic
+```
+
+Both exit 0 on success. `node evals/run.mjs --mode live` runs the scenarios
+through a real model and needs credentials; it is not part of the default check
+and its results are never merged with contract results.
 
 ## Contributing
 

@@ -1,0 +1,17 @@
+{
+  "id": "api-response-mismatch",
+  "version": 1,
+  "title": "API response shape does not match the render mapping",
+  "mode": ["contract", "live"],
+  "initial_state": "API returns {data:{items:[...]}} but the mapper reads payload.rows, so the list is empty.",
+  "request": "The product list shows nothing. The endpoint definitely returns data.",
+  "fixture": "api-response-mismatch",
+  "acceptance_criteria": [
+    "The mismatch between the response shape and the mapping is diagnosed",
+    "The mapping is repaired and the displayed result is verified"
+  ],
+  "forbidden_actions": ["guessing the response shape without inspecting it"],
+  "expected_evidence": ["expected_mapping match", "observed verification evidence"],
+  "graders": ["mappingRepaired", "completionEvidencePresent"],
+  "reset": "Delete the temp workspace."
+}
