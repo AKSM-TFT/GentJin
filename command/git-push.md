@@ -14,9 +14,25 @@ Run the guarded push workflow for the current repository's pending changes, foll
 
 5. Show the user the exact branch name you plan to create and ask for explicit approval before creating it, committing on it, or pushing. If the user does not want the proposed name, let them type their own preferred branch name and use that instead.
 
-6. After approval, create the branch, stage only the files that belong to the logical change, and make one focused commit with a subject matching the repository's commit style. Never stage secrets, credentials, environment files, or generated artifacts.
+6. After approval, create the branch, stage only the files that belong to the logical change, and make one focused commit with a subject matching the repository's commit style. Never stage secrets, credentials, environment files, or generated artifacts. Before staging, run the QA Artifact Check below: any seed, test fixture, or QA scaffolding that was created only to exercise the change must be removed or converted into a real test before it is staged. Nothing meant only for automatic QA may be pushed.
 
 7. Push with upstream tracking (`git push -u origin <branch>`), then report the branch name, the derived Jira backlog title, the commit reference, and a pull-request link when the remote provides one (`git push` output usually includes it).
+
+## QA Artifact Check
+
+Before anything is staged for commit, scan the pending file list for artifacts that exist only to support automatic verification of the change rather than to ship. These must not be pushed.
+
+Watch for:
+
+- Seed files and seed scripts (for example `seed.*`, `seeds/`, `*.seed.*`, database reset scripts) created to populate local test data.
+- Temporary test scaffolding created to exercise the change by hand and then forgotten: throwaway fixtures, sample payloads, scratch test routes, and one-off scripts.
+- Mock or stub data, fixtures, or fake services added only for local QA of the change.
+- Ad-hoc verification scripts that were not added to the project's real test suite or documented as tests.
+- Large generated artifacts, snapshot dumps, or output files produced while testing.
+
+For each match, decide: is this part of the project's real test or seed system that should ship and be maintained, or was it created only for automatic QA of this change? The second kind must be removed before staging, or moved out of the repository's tracked files. Do not stage it.
+
+If a real seed or test system is being added deliberately, say so explicitly and stage it; the rule targets QA scaffolding, not legitimate test infrastructure. When unsure whether a file qualifies, ask the user rather than guessing.
 
 ## Derive the Jira Backlog Title
 

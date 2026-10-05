@@ -14,6 +14,10 @@ Before a requested commit or source-control change:
 ## Repository Conventions
 Detect and follow the repository's own branch naming format rather than inventing one. If it has none, use the default from the global `## GitHub Pushes` rules and continue its sequence. Stage only the files belonging to the logical change.
 
+## QA Artifact Check
+
+Before staging for commit, scan the pending file list for artifacts that exist only to support automatic verification of the change rather than to ship. Seeds, throwaway fixtures, scratch test routes, mock or stub data added only for local QA, ad-hoc verification scripts, and generated test output must be removed or converted into real tests before they are staged. Nothing meant only for automatic QA may be pushed. Legitimate test infrastructure and deliberate seed systems are fine to stage; when unsure, ask.
+
 ## Jira Backlog Title
 When the branch name matches `^[A-Z]+-\d+-(.+)$`, derive the Jira title from the description: split on `-`, uppercase any word of two characters or fewer, capitalize the rest, and join with spaces.
 
