@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gentjin.local/schemas/task-record.schema.json",
+  "title": "GENTJIN Task Record",
+  "description": "One versioned record per task. Authoritative for lifecycle state and completion eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "project_id",
+    "created_at",
+    "updated_at",
+    "state",
+    "phase",
+    "request",
+    "scope",
+    "acceptance_criteria",
+    "selected_skills",
+    "memory_references",
+    "actions",
+    "verification",
+    "blockers",
+    "outcome"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "task_id": {
+      "type": "string",
+      "pattern": "^task-[0-9a-f]{12}$",
+      "description": "Unique task identifier."
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "parent_task_id": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+
+    "state": {
+      "type": "string",
+      "enum": [
+        "in_progress",
+        "blocked",
+        "needs_verification",
+        "completed",
+        "failed",
+        "abandoned"
+      ],
+      "description": "Intermediate lifecycle state. Distinct from outcome.result."
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "observe",
+        "retrieve",
+        "plan",
+        "act",
+        "verify",
+        "reflect",
+        "store"
+      ]
+    },
+
+    "request": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_paths", "allow_code_changes"],
+      "properties": {
+        "allowed_paths": { "type": "array", "items": { "type": "string" } },
+        "allowed_skills": { "type": "array", "items": { "type": "string" } },
+        "allow_code_changes": { "type": "boolean" },
+        "description": { "type": ["string", "null"] }
+      }
+    },
+
+    "acceptance_criteria": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/criterion" }
+    },
+
+    "selected_skills": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/selectedSkill" }
+    },
+    "routing": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "basis": {
+          "type": "string",
+          "enum": ["observed", "inferred", "user_specified"],
+          "description": "Skill selection is not hook-observable. Never claim 'observed' without a first-class event."
+        },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "overrides": { "type": "array", "items": { "type": "string" } },
+        "unavailable_capabilities": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "memory_references": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/memoryReference" }
+    },
+
+    "plan": { "type": "array", "items": { "type": "string" } },
+
+    "attempts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/attempt" }
+    },
+
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    },
+
+    "file_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "reason": { "type": "string", "minLength": 1 },
+          "change_type": { "type": "string", "enum": ["added", "modified", "deleted"] }
+        }
+      }
+    },
+
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence"],
+      "properties": {
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "checks_run": { "type": "integer", "minimum": 0 },
+        "checks_required": { "type": "integer", "minimum": 0 },
+        "notes": { "type": ["string", "null"] }
+      }
+    },
+
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "blocking"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1 },
+          "blocking": { "type": "boolean" },
+          "needs_from_user": { "type": "boolean" },
+          "unblock_check": { "type": ["string", "null"] }
+        }
+      }
+    },
+
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": ["pending", "success", "partial", "failed", "abandoned"]
+        },
+        "summary": { "type": ["string", "null"] },
+        "evaluated_at": { "type": ["string", "null"] }
+      }
+    },
+
+    "validation": { "$ref": "#/$defs/validationResult" }
+  },
+
+  "$defs": {
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "status"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["pass", "fail", "not_run", "not_applicable"]
+        },
+        "mandatory": { "type": "boolean" },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "not_applicable_reason": { "type": ["string", "null"] },
+        "remaining_check": { "type": ["string", "null"] }
+      },
+      "dependentRequired": {
+        "not_applicable_reason": []
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "not_applicable" } }, "required": ["status"] },
+          "then": {
+            "required": ["not_applicable_reason"],
+            "properties": {
+              "not_applicable_reason": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+          "then": {
+            "required": ["evidence"],
+            "properties": { "evidence": { "type": "array", "minItems": 1 } }
+          }
+        },
+        {
+          "if": { "properties": { "status": { "const": "fail" } }, "required": ["status"] },
+          "then": { "required": ["remaining_check"] }
+        }
+      ]
+    },
+
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference", "source"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["command_exit_code", "file_diff", "test_report", "screenshot", "hook_event", "manual_note"]
+        },
+        "reference": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "enum": ["observed", "asserted"] },
+        "captured_at": { "type": ["string", "null"] }
+      }
+    },
+
+    "selectedSkill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skill", "reason"],
+      "properties": {
+        "skill": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "basis": { "type": "string", "enum": ["observed", "inferred", "user_specified"] }
+      }
+    },
+
+    "memoryReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "relevance"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "relevance": { "type": "string", "minLength": 1 },
+        "note_type": { "type": ["string", "null"] },
+        "supersedes": { "type": ["string", "null"] }
+      }
+    },
+
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fingerprint", "summary"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "fingerprint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable hash of the approach, used to detect an equivalent retry."
+        },
+        "summary": { "type": "string", "minLength": 1 },
+        "files_touched": { "type": "array", "items": { "type": "string" } },
+        "verification": { "type": "array", "items": { "type": "string" } },
+        "observed_outcome": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "next_investigation": { "type": ["string", "null"] }
+      }
+    },
+
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "description", "executed", "source"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": ["read", "search", "edit", "command", "db_read", "report", "other"]
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "executed": {
+          "type": "boolean",
+          "description": "False means planned or suggested. A planned action is never an executed action."
+        },
+        "source": { "type": "string", "enum": ["observed", "asserted"] },
+        "tool": { "type": ["string", "null"] },
+        "exit_code": { "type": ["integer", "null"] },
+        "error_category": { "type": ["string", "null"] },
+        "event_id": { "type": ["string", "null"] }
+      }
+    },
+
+    "validationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible", "reasons"],
+      "properties": {
+        "eligible": { "type": "boolean" },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Blocking findings only. An empty array with eligible true is a valid pass."
+        },
+        "notes": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "description": "Informational findings that do not block, such as a justified not_applicable criterion."
+        },
+        "blocking_criteria": { "type": "array", "items": { "type": "string" } },
+        "evaluated_at": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

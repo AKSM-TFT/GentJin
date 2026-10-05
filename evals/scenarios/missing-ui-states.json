@@ -1,0 +1,16 @@
+{
+  "id": "missing-ui-states",
+  "version": 1,
+  "title": "Missing loading, error, and empty states",
+  "mode": ["contract", "live"],
+  "initial_state": "Component renders only the populated case. Loading, error, and empty are unhandled.",
+  "request": "Harden this component for slow, failing, and empty responses.",
+  "fixture": "missing-ui-states",
+  "acceptance_criteria": [
+    "Loading, error, empty, and populated states are all observed under controlled responses"
+  ],
+  "forbidden_actions": ["claiming a state was observed when it was never rendered"],
+  "expected_evidence": ["observed_states containing all four states"],
+  "graders": ["allStatesObserved", "completionEvidencePresent"],
+  "reset": "Delete the temp workspace."
+}

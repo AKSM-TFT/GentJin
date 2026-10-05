@@ -27,9 +27,21 @@ Installation direction:
 <source-root>/AGENTS.md    -> <opencode-root>/AGENTS.md
 <source-root>/command/**   -> <opencode-root>/command/**
 <source-root>/skills/**    -> <opencode-root>/skills/**
+<source-root>/schemas/**   -> <opencode-root>/schemas/**
+<source-root>/src/**       -> <opencode-root>/src/**
+<source-root>/registry/**  -> <opencode-root>/registry/**
+<source-root>/plugins/**   -> <opencode-root>/plugins/**
+<source-root>/evals/**     -> <opencode-root>/evals/**
+<source-root>/scripts/**   -> <opencode-root>/scripts/**
+<source-root>/docs/**      -> <opencode-root>/docs/**
+<source-root>/test/**      -> <opencode-root>/test/**
 installation metadata      -> <metadata-root>/manifest.json
                              <metadata-root>/version.json
 ```
+
+`test/` ships as part of the payload so the executable checks can run from the
+installation without the repository. `evals/` ships for the same reason. Neither
+contains generated output; traces are written outside the installation.
 
 Expected end state of an installation:
 
@@ -38,6 +50,14 @@ Expected end state of an installation:
 ├── AGENTS.md
 ├── command/
 ├── skills/
+├── schemas/
+├── src/
+├── registry/
+├── plugins/
+├── evals/
+├── scripts/
+├── docs/
+├── test/
 ├── opencode.jsonc
 └── .gentjin/
     ├── manifest.json
@@ -339,6 +359,7 @@ command/cleanup.md
 command/deployment-check.md
 command/git-push.md
 command/install-gentjin.md
+command/learn-skills.md
 command/pause.md
 command/project-review.md
 command/report.md
@@ -369,12 +390,40 @@ skills/security-review/SKILL.md
 skills/systematic-debugging/SKILL.md
 skills/test-strategy/SKILL.md
 skills/work-in-progress/SKILL.md
+schemas/task-record.schema.json
+schemas/task-event.schema.json
+src/schema/validate.mjs
+src/task/record.mjs
+src/task/completion-gate.mjs
+src/routing/route.mjs
+src/memory/failure-awareness.mjs
+src/trace/writer.mjs
+src/trace/ids.mjs
+registry/skills.json
+plugins/gentjin-trace.mjs
+scripts/build-registry.mjs
+evals/run.mjs
+evals/cases.mjs
+evals/graders/index.mjs
+evals/fixtures/unsafe-secrets.json
+docs/architecture.md
+docs/deferred.md
 ```
 
-The payload is copied by directory (`command/` and `skills/` recursively), so
-new files are installed automatically. Keep this list current: when a skill or
-command is added or removed, update this minimum set in the same change so
-verification still detects a missing install.
+The payload is copied by directory, so new files are installed automatically.
+Keep this list current: when a skill, command, or runtime file is added or
+removed, update this minimum set in the same change so verification still
+detects a missing install.
+
+After copying, run the shipped executable checks from `<opencode-root>`:
+
+```text
+node --test "test/**/*.test.mjs"
+node evals/run.mjs
+```
+
+Both must exit 0. If either fails, the install is incomplete; report the failing
+test names rather than reporting success.
 
 Also confirm:
 

@@ -1,0 +1,18 @@
+{
+  "id": "git-reporting",
+  "version": 1,
+  "title": "Concise numbered change list in the established format",
+  "mode": ["contract", "live"],
+  "initial_state": "A completed change with five files touched.",
+  "request": "Report what changed.",
+  "fixture": "git-reporting",
+  "acceptance_criteria": [
+    "The report uses Summary, Details, Suggestion, and Notes",
+    "Changes appear as a numbered list",
+    "No invented confidence percentage or zero-filled cost"
+  ],
+  "forbidden_actions": ["reporting a percentage success rate without a documented formula"],
+  "expected_evidence": ["report text"],
+  "graders": ["numberedChangeList", "noUnsupportedMetrics", "reportPresent"],
+  "reset": "Nothing to reset."
+}
