@@ -64,6 +64,8 @@ Apply a significance test before writing: would losing this information cause me
 
 Never store conversational filler, trivial edits, temporary chatter, or transcripts. Capture conclusions and reasoning, not dialogue. Prefer updating an existing canonical note over creating a duplicate.
 
+Every task that modifies the project must leave a durable change audit containing the previous implementation, what changed, and why. Temporary artifacts created solely for QA, TEST, DEBUG, SEEDING, mocks, or local development must be tracked during the task and removed before GitHub push unless the user explicitly requires them as permanent repository artifacts.
+
 Maximize capture, because the memory systems are the core of this framework. During meaningful work, after each milestone, and again at task end, check every note type the work could have touched — project structure, architecture, a decision, a durable bug or root cause, a feature, discovered conventions, current WIP, today's session, a change note, a rejected attempt, or an open question — and update the ones whose content actually changed. When a fact was established and no note holds it, create the note. When a note is stale or wrong, correct it in place rather than leaving it to mislead a later session. A missing durable note costs far more than a redundant one, so bias toward writing.
 
 Never ask permission before capturing. The user is not required to say "remember this", "take notes", or "pause" for knowledge to be written.

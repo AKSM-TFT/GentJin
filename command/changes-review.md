@@ -33,6 +33,21 @@ You must NOT edit files, create fixes, delete files, format files, upgrade depen
 
 Delegate to the specialized skills that the detected code actually needs, and load only those.
 
+## Change Audit and Push Hygiene Checks
+
+For every modifying task under review, additionally check:
+
+- Is there a durable change audit for this task, and does it follow the canonical template? If missing, flag it.
+- Does the audit describe the previous implementation / last code, what changed, and WHY? Vague reasons such as "updated code", "fixed issue", or "improved logic" are findings.
+- Does it list affected files and record actual verification?
+- Are there temporary task-created artifacts still in the diff — seeds, mock or stub data, scratch fixtures, generated test output?
+- Are there temporary debug statements, hardcoded IDs, bypassed auth, disabled validation, forced success responses, local-only URLs, or other session-only development code in modified production files?
+- Are there seed, QA, or test files in the diff that were created only for automatic QA of this change rather than requested as permanent repository artifacts?
+- Are there secrets, `.env`, or local configuration artifacts in the diff?
+- Does the final diff match the intended feature or fix, with no unrelated changes?
+
+Do not turn `changes-review` into an auto-delete command. Identify problems and feed the cleanup and push workflow.
+
 ## Output
 
 Produce one unified report with:

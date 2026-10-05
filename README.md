@@ -329,6 +329,10 @@ of asking the agent to remember every rule at once.
 - Keep the active context small and relevant.
 - Use the right review skill at the right trust boundary.
 - Preserve decisions, rejected approaches, and meaningful discoveries.
+- Track temporary QA, test, debug, seed, mock, and fixture artifacts in the
+  WIP ledger as they are created.
+- Write or update the durable change audit as the task evolves — previous
+  implementation, what changed, why, affected files, actual verification.
 
 ### Before handoff
 
@@ -344,6 +348,22 @@ of asking the agent to remember every rule at once.
 - Write an evidence-based report.
 - Capture reusable knowledge where it belongs.
 - Keep unfinished work visible with one clear next action.
+
+## Change audit and push hygiene
+
+Every task that modifies a project leaves a durable change audit in the
+project's `changes/` folder, following the canonical template. The audit
+records the previous implementation, what changed, why it changed, affected
+files, and what was actually verified — so the repository's history stays
+explainable later without relying on chat memory.
+
+Before any GitHub push, a mandatory cleanup gate scans the diff for
+task-created temporary artifacts: seed scripts, throwaway fixtures, scratch
+test routes, mock data added for local QA, ad-hoc verification scripts, and
+generated test output. These are removed or reverted before staging, and
+verification is re-run after cleanup. The branch or PR description is then a
+concise numbered list of real user-visible changes; the technical detail
+stays in the change audit, not in the PR body.
 
 ## Safe by default
 

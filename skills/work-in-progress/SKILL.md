@@ -22,8 +22,27 @@ Include when applicable:
 - Testing / Verification
 - Next Action
 - Related Knowledge
+- Change Audit (link to `changes/<note>.md` once written)
+- Temporary Artifact Ledger (see below)
 
 Preserve conclusions and reasoning, not chat transcripts. Update on meaningful progress, not every small edit.
+
+## Temporary Artifact Ledger
+
+Track temporary development artifacts at the moment they are created, not by guessing at push time. Maintain this table in the active WIP note, and reflect it in the durable change audit.
+
+```markdown
+## Temporary Artifact Ledger
+
+| File | Type | Purpose | Remove Before Push | Cleanup Status |
+|---|---|---|---|---|
+| scripts/debug-api.ts | DEBUG | Inspect API response | Yes | Removed / Retained / Pending |
+| db/seed-qa.ts | SEED | Create local QA records | Yes | Removed / Retained / Pending |
+```
+
+Types: TEST, QA, DEBUG, SEED, MOCK, FIXTURE, TEMP, LOCAL-ONLY.
+
+This ledger follows the task until completion or push. When a temporary artifact is removed, update its Cleanup Status to `Removed`. When the change audit is written, mirror the Removal status into its Temporary Development Artifacts section.
 
 ## Current Resume State
 

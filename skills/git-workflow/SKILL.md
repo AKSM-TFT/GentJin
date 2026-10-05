@@ -18,6 +18,10 @@ Detect and follow the repository's own branch naming format rather than inventin
 
 Before staging for commit, scan the pending file list for artifacts that exist only to support automatic verification of the change rather than to ship. Seeds, throwaway fixtures, scratch test routes, mock or stub data added only for local QA, ad-hoc verification scripts, and generated test output must be removed or converted into real tests before they are staged. Nothing meant only for automatic QA may be pushed. Legitimate test infrastructure and deliberate seed systems are fine to stage; when unsure, ask.
 
+## Branch Description
+
+The GitHub branch / PR description is a concise numbered list of meaningful, user-visible changes, not a technical log. Use 3–10 items by default, one concrete change per item, in plain language, preferring behavior over implementation detail. Derive the items from the active WIP, the durable change audit, and the actual final diff. Do not include file paths, function names, or a QA document in the branch description; that detail belongs in the change audit. Never invent a change not in the final diff.
+
 ## Jira Backlog Title
 When the branch name matches `^[A-Z]+-\d+-(.+)$`, derive the Jira title from the description: split on `-`, uppercase any word of two characters or fewer, capitalize the rest, and join with spaces.
 
