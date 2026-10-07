@@ -14,9 +14,15 @@ Run the guarded push workflow for the current repository's pending changes, foll
 
 5. Show the user the exact branch name you plan to create and ask for explicit approval before creating it, committing on it, or pushing. If the user does not want the proposed name, let them type their own preferred branch name and use that instead.
 
-6. After approval, create the branch, stage only the files that belong to the logical change, and make one focused commit with a subject matching the repository's commit style. Never stage secrets, credentials, environment files, or generated artifacts. Before staging, run the Pre-Push Cleanup Gate below: any seed, test fixture, or QA scaffolding that was created only to exercise the change must be removed or converted into a real test before it is staged. Nothing meant only for automatic QA may be pushed.
+6. After approval, create the branch, stage only the files that belong to the logical change, and make one focused commit per logical unit. Never stage secrets, credentials, environment files, or generated artifacts. Before staging, run the Pre-Push Cleanup Gate below: any seed, test fixture, or QA scaffolding that was created only to exercise the change must be removed or converted into a real test before it is staged. Nothing meant only for automatic QA may be pushed.
 
-7. Push with upstream tracking (`git push -u origin <branch>`), then report the branch name, the derived Jira backlog title, the commit reference, and a pull-request link when the remote provides one (`git push` output usually includes it).
+7. Prepare the commit subject and the concise numbered body from the final logical change, and check both against the Change Description Contract below. Fix anything verbose before it becomes history. Write a multiline message through a temporary file outside the repository and commit with `git commit -F`, never an inline shell string. Then confirm what was actually recorded with `git show -s --format=%B HEAD`.
+
+8. Push with upstream tracking (`git push -u origin <branch>`).
+
+9. Report, in this order and clearly separated: the branch name, the derived Jira backlog title, the commit reference, the cleanup result, the verification result, a pull-request link when the remote provides one, and the required `Notes`. After that, print the ready-to-paste PR title and concise numbered body in its own block, outside the report.
+
+Push authorization is not PR authorization. Creating or updating a pull request requires separate authorization; see Manual Pull Request Behavior below.
 
 ## Pre-Push Cleanup Gate
 
@@ -71,23 +77,86 @@ If the branch does not match the pattern, say so and do not invent a title. Neve
 
 Show the derived title in the report and ask the user to confirm or correct it before it is used anywhere.
 
-## Branch Description
+## Change Description Contract
 
-The GitHub branch / PR description must be a concise numbered list of meaningful, user-visible changes. It is a reader-facing summary, not a technical log.
+This single contract governs three outputs. Do not invent a separate style for any of them:
+
+1. The body of a commit made by this workflow.
+2. A proposed or explicitly authorized PR description.
+3. The ready-to-paste description supplied when the user will create the PR by hand.
+
+Format:
+
+```text
+<One short sentence summarizing the change, if useful.>
+
+1. <Concrete change and observable outcome.>
+2. <Another distinct change.>
+3. <Another distinct change.>
+```
 
 Rules:
 
-- Use a numbered list, 3–10 items by default. One concrete change per item.
-- Describe the outcome in plain language. Prefer behavior and result over implementation detail.
-- Mention the affected area or page when useful.
-- Skip implementation specifics: no file paths, no function names, no long paragraphs, no exhaustive QA document dumped into the description.
-- Group tightly related internal edits into one item that reflects the single user-visible change. Keep changes separate when they affect clearly different behavior.
-- Do not invent changes that are not in the final branch, and do not omit a real one just to make the list cleaner.
-- Do not describe temporary or deleted development artifacts as shipped changes.
-- Derive the items from the current task/WIP, the durable change audit, and the actual final diff. Do not trust memory or commit messages alone.
+- Use a numbered list, 3–10 items for a substantial change. Use fewer when only one or two meaningful changes exist. Never invent filler to reach a count.
+- One outcome per item, usually one sentence. Aim for roughly 15–30 words rather than a rigid truncation limit.
+- Use everyday language, naming the affected feature, page, or skill when useful. GENTJIN's readers are developers, so meaningful developer-facing improvements count.
+- Group related internal edits by their outcome.
+- Exclude file paths, symbol names, loader mechanics, stack traces, investigation narratives, and test inventories by default.
+- Avoid sections such as Root Cause, Implementation, Testing, Notes, or Documentation in the default body.
+- Include a short material limitation when omitting it would mislead. Never hide genuine unresolved risk for brevity, and never claim tests, installation, or live behavior passed without observed evidence.
+- Derive the items from the final branch diff plus the relevant task and audit evidence, not from the most recent commit or memory.
+- A detailed description remains available when the user explicitly requests one or repository policy mandates it. Otherwise this concise format wins.
 
-If the user explicitly asks for a technical or detailed description, that is allowed. Otherwise the numbered summary is the default.
+The detailed technical record lives in the durable change audit and the vault, not in the commit or PR body.
 
-The detailed technical record lives in the durable change audit and the vault, not in the PR body.
+### Prepare and validate before committing
+
+Before committing, prepare the subject and the concise numbered body, then check it against this contract. Fix verbose output while it is still a draft, not after it is already history.
+
+Write a multiline message through a message file rather than inline shell text so real newlines survive and nothing is interpolated:
+
+```text
+write the subject and body to a temporary file outside the repository
+git commit -F <that file>
+remove the file
+```
+
+Never embed a multiline commit message in a shell string.
+
+Keep separate logical commits separate. Do not squash or rewrite history to influence what GitHub prefills.
+
+Before a requested push, inspect what was actually written:
+
+```text
+git show -s --format=%B HEAD
+```
+
+If the body is verbose, say so and offer a corrected commit or a concise PR body. Never silently amend or rewrite an existing shared commit.
+
+## Manual Pull Request Behavior
+
+A push does not create or update a pull request. Push authorization is not PR authorization, and never create a PR as a side effect of a push.
+
+After preparing or pushing a branch, print a clearly separated, ready-to-paste block containing:
+
+1. The PR title.
+2. The concise numbered body.
+
+Keep it visually separate from the console report. The console report keeps the branch name, commit reference, test results, cleanup detail, and the required `Notes` section outside the copyable block, so the reader never copies audit output into the PR by accident.
+
+GitHub suggests a PR title and body from the commit subject and body when the comparison contains a single commit. With multiple commits, a template, or another prefill source, do not promise that the prepared text will appear automatically. Give the user the exact text to paste or to replace the suggestion.
+
+When the user separately authorizes PR creation or an update, pass the prepared description explicitly:
+
+- With `gh`, write the body to a file and pass `--body-file`, never an inline interpolated string.
+- Never substitute the detailed console report or the vault audit as the PR body.
+
+### What the format checks do and do not prove
+
+The change-description evaluator is deterministic. It inspects produced text and confirms the shape of the output: that a numbered list is present, that no file paths, test inventories, or audit sections leaked in, and that a long paragraph did not follow the list.
+
+It does not observe a model choosing to follow the contract, and it does not observe the GitHub UI. The claim that GitHub prefills a single-commit PR from the commit subject and body comes from GitHub's own documentation, not from a verified UI session in this repository. State that distinction when reporting.
+
+Never present a passing format check as proof that the live agent, or GitHub, behaved as the contract expects.
 
 Stop and wait whenever the push target is unclear, the scope is ambiguous, the branch naming convention is uncertain, or a new file would expose sensitive information. Never rewrite history, force-push, or remove files while doing this.

@@ -20,7 +20,7 @@ Before staging for commit, scan the pending file list for artifacts that exist o
 
 ## Branch Description
 
-The GitHub branch / PR description is a concise numbered list of meaningful, user-visible changes, not a technical log. Use 3–10 items by default, one concrete change per item, in plain language, preferring behavior over implementation detail. Derive the items from the active WIP, the durable change audit, and the actual final diff. Do not include file paths, function names, or a QA document in the branch description; that detail belongs in the change audit. Never invent a change not in the final diff.
+The branch / PR description follows the Change Description contract below. Derive the items from the active WIP, the durable change audit, and the actual final diff.
 
 ## Jira Backlog Title
 When the branch name matches `^[A-Z]+-\d+-(.+)$`, derive the Jira title from the description: split on `-`, uppercase any word of two characters or fewer, capitalize the rest, and join with spaces.
@@ -34,8 +34,39 @@ Do not derive a title from a branch that does not match, or from a protected bra
 
 The `/git-push` command implements this workflow end to end.
 
+## Change Description
+One contract governs three outputs: the body of a commit, a proposed or authorized PR description, and the ready-to-paste text for a PR the user will open by hand. Do not invent a separate style for any of them.
+
+```text
+<One short sentence summarizing the change, if useful.>
+
+1. <Concrete change and observable outcome.>
+2. <Another distinct change.>
+```
+
+- Use a numbered list, 3–10 items for a substantial change; fewer when only one or two meaningful changes exist. Never pad to reach a count.
+- One outcome per item, roughly 15–30 words. Plain language, naming the affected feature or skill when useful.
+- Exclude file paths, symbol names, loader mechanics, stack traces, investigation narratives, and test inventories by default.
+- Avoid Root Cause, Implementation, Testing, Notes, and Documentation sections in the default body.
+- Include a short material limitation when omitting it would mislead. Never hide unresolved risk for brevity, and never claim tests or live behavior passed without observed evidence.
+- A detailed body remains available when the user asks for one or repository policy requires it.
+- The detailed technical record lives in the change audit and the vault, not in the commit or PR body.
+
 ## Commits
-Create one focused commit per logical unit. Prefer a short imperative subject, blank line, and concise body explaining why when useful. Match existing repository commit style when present.
+Create one focused commit per logical unit. Match existing repository commit style, and apply the Change Description contract to the body.
+
+Prepare and check the subject and body before committing, not after. Write a multiline message through a file outside the repository and commit with `git commit -F`, never an inline shell string, so real newlines survive and nothing is interpolated.
+
+Confirm what was recorded with `git show -s --format=%B HEAD` before a requested push. If it is verbose, say so and offer a corrected commit or a concise PR body. Never silently amend or rewrite an existing shared commit, and never squash history to influence what GitHub prefills.
+
+## Pull Requests
+A push does not create or update a pull request. Push authorization is not PR authorization.
+
+After pushing, print the ready-to-paste PR title and body in their own block, visually separate from the console report. Keep the branch name, commit reference, test results, cleanup detail, and required Notes outside that block so they are never copied in by accident.
+
+GitHub suggests a PR title and body from the commit subject and body when the comparison has a single commit. With multiple commits or a template, do not promise the prepared text will appear automatically; give the user the exact text to paste.
+
+When the user separately authorizes PR creation or an update, pass the description explicitly. With `gh`, use a body file with `--body-file`. Never substitute the console report or a vault audit as the PR body.
 
 ## Knowledge Sync
 After meaningful work, ensure relevant WIP/vault knowledge reflects what is being committed. Do not claim source-control state without checking it.

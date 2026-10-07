@@ -61,6 +61,8 @@ Documentation
 
 `Changes` is required. `Notes` is required. `Documentation` is required for any change to a project; it points the reader to the durable change audit and states the cleanup outcome. Include Testing only if checks ran, Issues only for unresolved limitations.
 
+`Notes` and `Documentation` belong to this console report only. They are never copied into a commit message, a branch description, or a pull request body. When a change also needs a commit or PR description, produce that separately under the Change Description contract in `git-workflow`, and keep this report outside the copyable text.
+
 `Notes` must list every vault note this work created, updated, or corrected, with the durable fact each one now holds. If genuinely nothing durable was established, write `None — no durable knowledge established` and say why in one clause. A missing `Notes` section is a defect in the report, not a style choice. Never report completion with `Notes` unstated.
 
 Console readability rules (apply to every `/report`):
