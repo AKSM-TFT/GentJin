@@ -1,9 +1,9 @@
 import { createTracePlugin } from "../src/trace/plugin-body.mjs"
 
 /**
- * OpenCode 1.18.34 invokes a plugin only when its default export is an inline
+ * OpenCode 1.18.35 invokes a plugin only when its default export is an inline
  * arrow function, and only discovers files ending in .js or .ts. Verified
- * empirically against 1.18.34:
+ * empirically against 1.18.35:
  *
  *   - a .mjs file in plugins/ is never imported
  *   - `export const P = async () => {}` with `export default P` is imported

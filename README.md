@@ -445,7 +445,11 @@ GENTJIN is designed to make the cautious path the easy path:
 │   └── guardrails/git-guardrails.mjs
 ├── registry/skills.json       Generated skill and capability registry
 ├── plugins/gentjin-trace.js  Trace plugin using real OpenCode hooks
+│   ├── gentjin-capabilities.ts  Capability loader + guarded-action block
+├── src/capabilities/         Registry, resolution, loader, adherence state
+├── registry/capabilities.json  Unified skill + command catalog
 ├── scripts/build-registry.mjs
+├── scripts/build-capabilities.mjs
 ├── evals/                     Executable evaluation suite
 │   ├── run.mjs                Contract and live modes
 │   ├── cases.mjs

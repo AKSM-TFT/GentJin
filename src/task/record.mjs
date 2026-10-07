@@ -79,6 +79,7 @@ export function makeTaskRecord(input = {}) {
     file_changes: input.file_changes ?? [],
     verification: input.verification ?? { evidence: [], checks_run: 0, checks_required: 0, notes: null },
     blockers: input.blockers ?? [],
+    reconciliation: input.reconciliation ?? [],
     outcome: input.outcome ?? { result: "pending", summary: null, evaluated_at: null },
     ...(input.validation ? { validation: input.validation } : {}),
   }
@@ -156,4 +157,61 @@ export function setState(record, nextState, patch = {}) {
 export function setPhase(record, phase) {
   if (!PHASES.includes(phase)) throw new Error(`unknown phase: ${phase}`)
   return { ...record, phase, updated_at: new Date().toISOString() }
+}
+const RECONCILIATION_TRIGGERS = ["guard_blocked", "hook_blocked", "bypass_detected", "manual"]
+
+export function markReconciliation(record, entry) {
+  const checks = Array.isArray(entry.checks_needed) ? entry.checks_needed.filter(Boolean) : []
+  if (checks.length === 0) {
+    throw new Error("reconciliation.checks_needed must name at least one check that is still needed")
+  }
+  if (!RECONCILIATION_TRIGGERS.includes(entry.trigger)) {
+    throw new Error(`reconciliation.trigger must be one of ${RECONCILIATION_TRIGGERS.join(", ")}`)
+  }
+  if (!entry.capability) {
+    throw new Error("reconciliation.capability must name the workflow that was bypassed")
+  }
+
+  return {
+    ...record,
+    reconciliation: [
+      ...(record.reconciliation ?? []),
+      {
+        trigger: entry.trigger,
+        capability: entry.capability,
+        detected_at: entry.detected_at ?? new Date().toISOString(),
+        checks_needed: checks,
+        resolved_at: null,
+        resolution_evidence: [],
+      },
+    ],
+    updated_at: new Date().toISOString(),
+  }
+}
+
+export function resolveReconciliation(record, capability, evidence = []) {
+  const open = (record.reconciliation ?? []).filter(
+    (r) => r.capability === capability && r.resolved_at === null,
+  )
+  if (open.length === 0) {
+    throw new Error(`no open reconciliation for "${capability}"`)
+  }
+  if (!Array.isArray(evidence) || evidence.length === 0) {
+    throw new Error("resolving a reconciliation requires evidence that the listed checks were run")
+  }
+
+  const at = new Date().toISOString()
+  return {
+    ...record,
+    reconciliation: (record.reconciliation ?? []).map((r) =>
+      r.capability === capability && r.resolved_at === null
+        ? { ...r, resolved_at: at, resolution_evidence: evidence }
+        : r,
+    ),
+    updated_at: at,
+  }
+}
+
+export function openReconciliations(record) {
+  return (record.reconciliation ?? []).filter((r) => r.resolved_at === null)
 }

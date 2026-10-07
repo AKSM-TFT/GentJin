@@ -24,7 +24,10 @@
     "outcome"
   ],
   "properties": {
-    "schema_version": { "type": "integer", "const": 1 },
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
     "task_id": {
       "type": "string",
       "pattern": "^task-[0-9a-f]{12}$",
@@ -35,10 +38,20 @@
       "minLength": 1,
       "pattern": "^[a-z0-9][a-z0-9._-]*$"
     },
-    "parent_task_id": { "type": ["string", "null"] },
-    "created_at": { "type": "string", "format": "date-time" },
-    "updated_at": { "type": "string", "format": "date-time" },
-
+    "parent_task_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "state": {
       "type": "string",
       "enum": [
@@ -63,262 +76,699 @@
         "store"
       ]
     },
-
-    "request": { "type": "string", "minLength": 1 },
+    "request": {
+      "type": "string",
+      "minLength": 1
+    },
     "scope": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["allowed_paths", "allow_code_changes"],
+      "required": [
+        "allowed_paths",
+        "allow_code_changes"
+      ],
       "properties": {
-        "allowed_paths": { "type": "array", "items": { "type": "string" } },
-        "allowed_skills": { "type": "array", "items": { "type": "string" } },
-        "allow_code_changes": { "type": "boolean" },
-        "description": { "type": ["string", "null"] }
+        "allowed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_code_changes": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "acceptance_criteria": {
       "type": "array",
-      "items": { "$ref": "#/$defs/criterion" }
+      "items": {
+        "$ref": "#/$defs/criterion"
+      }
     },
-
     "selected_skills": {
       "type": "array",
-      "items": { "$ref": "#/$defs/selectedSkill" }
+      "items": {
+        "$ref": "#/$defs/selectedSkill"
+      }
     },
     "routing": {
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "additionalProperties": false,
       "properties": {
         "basis": {
           "type": "string",
-          "enum": ["observed", "inferred", "user_specified"],
+          "enum": [
+            "observed",
+            "inferred",
+            "user_specified"
+          ],
           "description": "Skill selection is not hook-observable. Never claim 'observed' without a first-class event."
         },
-        "evidence": { "type": "array", "items": { "type": "string" } },
-        "overrides": { "type": "array", "items": { "type": "string" } },
-        "unavailable_capabilities": { "type": "array", "items": { "type": "string" } }
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unavailable_capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
-
     "memory_references": {
       "type": "array",
-      "items": { "$ref": "#/$defs/memoryReference" }
+      "items": {
+        "$ref": "#/$defs/memoryReference"
+      }
     },
-
-    "plan": { "type": "array", "items": { "type": "string" } },
-
+    "plan": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "attempts": {
       "type": "array",
-      "items": { "$ref": "#/$defs/attempt" }
+      "items": {
+        "$ref": "#/$defs/attempt"
+      }
     },
-
     "actions": {
       "type": "array",
-      "items": { "$ref": "#/$defs/action" }
+      "items": {
+        "$ref": "#/$defs/action"
+      }
     },
-
     "file_changes": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "reason"],
+        "required": [
+          "path",
+          "reason"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "reason": { "type": "string", "minLength": 1 },
-          "change_type": { "type": "string", "enum": ["added", "modified", "deleted"] }
+          "path": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "change_type": {
+            "type": "string",
+            "enum": [
+              "added",
+              "modified",
+              "deleted"
+            ]
+          }
         }
       }
     },
-
     "verification": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["evidence"],
+      "required": [
+        "evidence"
+      ],
       "properties": {
-        "evidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
-        "checks_run": { "type": "integer", "minimum": 0 },
-        "checks_required": { "type": "integer", "minimum": 0 },
-        "notes": { "type": ["string", "null"] }
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "checks_run": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks_required": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "blockers": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["description", "blocking"],
+        "required": [
+          "description",
+          "blocking"
+        ],
         "properties": {
-          "description": { "type": "string", "minLength": 1 },
-          "blocking": { "type": "boolean" },
-          "needs_from_user": { "type": "boolean" },
-          "unblock_check": { "type": ["string", "null"] }
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "blocking": {
+            "type": "boolean"
+          },
+          "needs_from_user": {
+            "type": "boolean"
+          },
+          "unblock_check": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     },
-
     "outcome": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["result"],
+      "required": [
+        "result"
+      ],
       "properties": {
         "result": {
           "type": "string",
-          "enum": ["pending", "success", "partial", "failed", "abandoned"]
+          "enum": [
+            "pending",
+            "success",
+            "partial",
+            "failed",
+            "abandoned"
+          ]
         },
-        "summary": { "type": ["string", "null"] },
-        "evaluated_at": { "type": ["string", "null"] }
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
-    "validation": { "$ref": "#/$defs/validationResult" }
+    "validation": {
+      "$ref": "#/$defs/validationResult"
+    },
+    "reconciliation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "trigger",
+          "capability",
+          "checks_needed"
+        ],
+        "properties": {
+          "trigger": {
+            "type": "string",
+            "enum": [
+              "guard_blocked",
+              "hook_blocked",
+              "bypass_detected",
+              "manual"
+            ]
+          },
+          "capability": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detected_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "checks_needed": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "resolved_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolution_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
   },
-
   "$defs": {
     "criterion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "description", "status"],
+      "required": [
+        "id",
+        "description",
+        "status"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "description": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
         "status": {
           "type": "string",
-          "enum": ["pass", "fail", "not_run", "not_applicable"]
+          "enum": [
+            "pass",
+            "fail",
+            "not_run",
+            "not_applicable"
+          ]
         },
-        "mandatory": { "type": "boolean" },
-        "evidence": { "type": "array", "items": { "type": "string" } },
-        "not_applicable_reason": { "type": ["string", "null"] },
-        "remaining_check": { "type": ["string", "null"] }
+        "mandatory": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "not_applicable_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "remaining_check": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       },
       "dependentRequired": {
         "not_applicable_reason": []
       },
       "allOf": [
         {
-          "if": { "properties": { "status": { "const": "not_applicable" } }, "required": ["status"] },
-          "then": {
-            "required": ["not_applicable_reason"],
+          "if": {
             "properties": {
-              "not_applicable_reason": { "type": "string", "minLength": 1 }
+              "status": {
+                "const": "not_applicable"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "not_applicable_reason"
+            ],
+            "properties": {
+              "not_applicable_reason": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           }
         },
         {
-          "if": { "properties": { "status": { "const": "pass" } }, "required": ["status"] },
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
           "then": {
-            "required": ["evidence"],
-            "properties": { "evidence": { "type": "array", "minItems": 1 } }
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
           }
         },
         {
-          "if": { "properties": { "status": { "const": "fail" } }, "required": ["status"] },
-          "then": { "required": ["remaining_check"] }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "fail"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "remaining_check"
+            ]
+          }
         }
       ]
     },
-
     "evidence": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "reference", "source"],
+      "required": [
+        "kind",
+        "reference",
+        "source"
+      ],
       "properties": {
         "kind": {
           "type": "string",
-          "enum": ["command_exit_code", "file_diff", "test_report", "screenshot", "hook_event", "manual_note"]
+          "enum": [
+            "command_exit_code",
+            "file_diff",
+            "test_report",
+            "screenshot",
+            "hook_event",
+            "manual_note"
+          ]
         },
-        "reference": { "type": "string", "minLength": 1 },
-        "source": { "type": "string", "enum": ["observed", "asserted"] },
-        "captured_at": { "type": ["string", "null"] }
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "asserted"
+          ]
+        },
+        "captured_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supports": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "event_type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "tool": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "exit_code": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "outcome": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "error",
+                "skipped",
+                "blocked",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "event_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Recorded runtime event this evidence resolves to."
+        }
       }
     },
-
     "selectedSkill": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["skill", "reason"],
+      "required": [
+        "skill",
+        "reason"
+      ],
       "properties": {
-        "skill": { "type": "string", "minLength": 1 },
-        "reason": { "type": "string", "minLength": 1 },
-        "basis": { "type": "string", "enum": ["observed", "inferred", "user_specified"] }
+        "skill": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "inferred",
+            "user_specified"
+          ]
+        }
       }
     },
-
     "memoryReference": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "relevance"],
+      "required": [
+        "path",
+        "relevance"
+      ],
       "properties": {
-        "path": { "type": "string", "minLength": 1 },
-        "relevance": { "type": "string", "minLength": 1 },
-        "note_type": { "type": ["string", "null"] },
-        "supersedes": { "type": ["string", "null"] }
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relevance": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supersedes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "attempt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "fingerprint", "summary"],
+      "required": [
+        "id",
+        "fingerprint",
+        "summary"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
         "fingerprint": {
           "type": "string",
           "minLength": 1,
           "description": "Stable hash of the approach, used to detect an equivalent retry."
         },
-        "summary": { "type": "string", "minLength": 1 },
-        "files_touched": { "type": "array", "items": { "type": "string" } },
-        "verification": { "type": "array", "items": { "type": "string" } },
-        "observed_outcome": { "type": "string", "minLength": 1 },
-        "evidence": { "type": "array", "items": { "type": "string" } },
-        "next_investigation": { "type": ["string", "null"] }
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "files_touched": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "observed_outcome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_investigation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "action": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "description", "executed", "source"],
+      "required": [
+        "id",
+        "kind",
+        "description",
+        "executed",
+        "source"
+      ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
         "kind": {
           "type": "string",
-          "enum": ["read", "search", "edit", "command", "db_read", "report", "other"]
+          "enum": [
+            "read",
+            "search",
+            "edit",
+            "command",
+            "db_read",
+            "report",
+            "other"
+          ]
         },
-        "description": { "type": "string", "minLength": 1 },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
         "executed": {
           "type": "boolean",
           "description": "False means planned or suggested. A planned action is never an executed action."
         },
-        "source": { "type": "string", "enum": ["observed", "asserted"] },
-        "tool": { "type": ["string", "null"] },
-        "exit_code": { "type": ["integer", "null"] },
-        "error_category": { "type": ["string", "null"] },
-        "event_id": { "type": ["string", "null"] }
+        "source": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "asserted"
+          ]
+        },
+        "tool": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "error_category": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "event_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "validationResult": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["eligible", "reasons"],
+      "required": [
+        "eligible",
+        "reasons"
+      ],
       "properties": {
-        "eligible": { "type": "boolean" },
+        "eligible": {
+          "type": "boolean"
+        },
         "reasons": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "Blocking findings only. An empty array with eligible true is a valid pass."
         },
         "notes": {
-          "type": ["array", "null"],
-          "items": { "type": "string" },
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
           "description": "Informational findings that do not block, such as a justified not_applicable criterion."
         },
-        "blocking_criteria": { "type": "array", "items": { "type": "string" } },
-        "evaluated_at": { "type": ["string", "null"] }
+        "blocking_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evaluated_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     }
   }

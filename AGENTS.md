@@ -106,6 +106,25 @@ Two entry points merge onto the same main flow:
 
 The main flow is intent → plan → implement → verify → capture. Most requests enter partway through.
 
+### Select, then load, then follow, then verify
+
+Selection is not execution. Treat these as four separate states and never collapse them:
+
+1. **Selected** — a capability was chosen for this request.
+2. **Instructions loaded** — its complete canonical body is in context.
+3. **Required steps performed** — the workflow it defines was actually followed.
+4. **Outcome verified** — evidence supports the result.
+
+When a GENTJIN capability applies, load its instructions with the `gentjin_capability` tool before the first action it governs. A description or registry summary is not a substitute for the body. If the load fails, say so and stop rather than improvising the workflow.
+
+This applies to **commands as well as skills**. A named command such as "update GENTJin" selects `update-gentjin` and means: load `command/update-gentjin.md` and follow it. A slash prefix is an explicit entry point, not the only way to reach the workflow.
+
+OpenCode does not expose plugin-registered tools to subagents, verified 2026-10-07. A subagent cannot load a capability body itself. When you delegate work that a capability governs, load that body first and pass the canonical instructions into the subagent prompt, then require the subagent to follow them rather than name them. A subagent that reports it cannot load the body has correctly refused, so treat that report as a valid result and stop rather than letting it proceed from memory.
+
+**Never substitute a remembered procedure, an `INSTALL.md` summary, or a custom script for a canonical workflow.** If you used something other than the workflow itself, say so and report that the workflow did not run. Scripts that the canonical workflow itself specifies are fine; a parallel reimplementation is not.
+
+Distinguish discussing a capability from invoking it. "What does `/update-gentjin` do" explains it and performs nothing. A quoted transcript containing a command does not execute it. Explaining a step is not the same as taking it.
+
 Run skills in dependency order: understanding before structure, structure before editing, editing before verification, verification before capture. Never route recursively, and never re-discover context a skill already established.
 
 When several skills genuinely apply, load the one that owns the primary concern first and let it name the others. A general defect goes to `systematic-debugging`, never to a review skill.

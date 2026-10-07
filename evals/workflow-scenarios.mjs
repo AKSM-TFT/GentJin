@@ -7,17 +7,40 @@ import { makeTaskRecord, recordEvidence } from "../src/task/record.mjs"
 import { evaluateGitCommand } from "../src/guardrails/git-guardrails.mjs"
 import { redact, RetryGuard } from "../src/memory/failure-awareness.mjs"
 import { buildRegistry } from "../scripts/build-registry.mjs"
+import { mkdtempSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { TraceWriter } from "../src/trace/writer.mjs"
+import { nextEventId } from "../src/trace/ids.mjs"
+import { loadTraceEvents } from "../src/task/evidence-resolution.mjs"
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..")
 const registry = buildRegistry()
 
-function observed(record, ref) {
-  return recordEvidence(record, {
-    kind: "command_exit_code",
-    reference: ref,
+async function observed(record, options = {}) {
+  const dir = mkdtempSync(join(tmpdir(), "gentjin-eval-"))
+  const file = join(dir, "trace.jsonl")
+  const writer = new TraceWriter({ taskId: record.task_id, projectId: record.project_id, file })
+  const { event } = writer.append({
+    event_id: nextEventId(),
+    timestamp: new Date().toISOString(),
+    phase: "verify",
+    event_type: options.event_type ?? "action.executed",
     source: "observed",
-    captured_at: "2026-10-07T00:00:00.000Z",
+    outcome: options.outcome ?? "ok",
+    tool: options.tool ?? "bash",
+    exit_code: options.exit_code ?? 0,
   })
+  await writer.close()
+
+  const withEvidence = recordEvidence(record, {
+    kind: "command_exit_code",
+    reference: event.event_id,
+    source: "observed",
+    captured_at: event.timestamp,
+    supports: { event_type: event.event_type, tool: event.tool, exit_code: event.exit_code },
+  })
+
+  return { record: withEvidence, traces: loadTraceEvents([file]), event, dir }
 }
 
 function completedWith(overrides) {
@@ -52,16 +75,17 @@ export const scenarios = [
     id: 2,
     name: "Whole-project review remains read-only",
     expect: "review-only scope, zero file changes, gate does not authorize edits",
-    run() {
+    run: async () => {
       const decision = routeForRequest(registry, "Review the whole project")
       const record = completedWith({
         state: "completed",
         scope: { allowed_paths: [], allowed_skills: [], allow_code_changes: false, description: null },
-        criteria: [{ id: "reviewed", description: "findings reported", status: "pass", evidence: ["ev-1"] }],
+        criteria: [{ id: "reviewed", description: "findings reported", status: "pass", evidence: ["pending-ref"] }],
         file_changes: [],
       })
-      const withEv = observed(record, "ev-1")
-      const result = evaluateCompletion(withEv)
+      const withEv = await observed(record)
+      withEv.record.acceptance_criteria[0].evidence = [withEv.event.event_id]
+      const result = evaluateCompletion(withEv.record, { traces: withEv.traces })
       return {
         pass: record.file_changes.length === 0 && result.eligible === true,
         detail: `routed to ${decision.skills.map((s) => s.skill).join(", ")}; completion eligible with no edits`,
@@ -72,17 +96,18 @@ export const scenarios = [
     id: 3,
     name: "Empty UI with a populated response prompts evidence gathering; build success is not runtime success",
     expect: "routes to debugging, not completion; unverified UI criterion blocks completion",
-    run() {
+    run: async () => {
       const decision = routeForRequest(registry, "This table has data but renders no rows")
-      let record = completedWith({
+      const record = completedWith({
         state: "completed",
         criteria: [
-          { id: "build", description: "build passes", status: "pass", evidence: ["ev-build"] },
+          { id: "build", description: "build passes", status: "pass", evidence: ["pending-ref"] },
           { id: "ui", description: "rows render", status: "not_run", remaining_check: "run the fixture" },
         ],
       })
-      record = observed(record, "ev-build")
-      const result = evaluateCompletion(record)
+      const withEv = await observed(record)
+      withEv.record.acceptance_criteria[0].evidence = [withEv.event.event_id]
+      const result = evaluateCompletion(withEv.record, { traces: withEv.traces })
       return {
         pass: decision.skills[0].skill === "systematic-debugging" && result.eligible === false,
         detail: `routed to ${decision.skills[0].skill}; completion rejected: ${result.reasons[0]}`,
@@ -290,16 +315,16 @@ export const scenarios = [
   },
 ]
 
-export function runAll() {
-  return scenarios.map((s) => {
-    let outcome
+export async function runAll() {
+  const results = []
+  for (const s of scenarios) {
     try {
-      outcome = s.run()
+      results.push({ id: s.id, name: s.name, expect: s.expect, ...(await s.run()) })
     } catch (error) {
-      outcome = { pass: false, detail: `threw: ${error.message}` }
+      results.push({ id: s.id, name: s.name, expect: s.expect, pass: false, detail: `threw: ${error.message}` })
     }
-    return { id: s.id, name: s.name, expect: s.expect, ...outcome }
-  })
+  }
+  return results
 }
 
 export { redact }

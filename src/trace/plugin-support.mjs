@@ -27,6 +27,6 @@ export const pluginManifest = {
   coverage_note:
     "Skill selection is not observable through any hook. Routing recorded alongside traces is inferred and must be labeled as such.",
   load_contract:
-    "OpenCode 1.18.34 discovers only .js and .ts, and invokes only an inline default export. " +
+    "OpenCode 1.18.35 discovers only .js and .ts, and invokes only an inline default export. " +
     "The plugin file exports nothing else.",
 }
