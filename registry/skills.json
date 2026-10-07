@@ -126,10 +126,10 @@
       "triggers": [
         "architecture",
         "subsystem",
-        "boundary",
         "migration path",
         "redesign",
-        "scaffold"
+        "scaffold",
+        "module ownership"
       ],
       "prerequisites": [],
       "scope": "review_and_report",
@@ -585,7 +585,7 @@
     {
       "skill": "requirements-review",
       "version": 1,
-      "description": "Clarify ambiguous requests, missing constraints, conflicting rules, and acceptance criteria before implementation. Use when a feature request is vague, business rules are incomplete, more than one interpretation is genuinely plausible, or implementation would require guessing a decision that changes the result. Not for ordinary requests that are already clear enough to build.",
+      "description": "Clarify ambiguous requests, missing constraints, conflicting rules, acceptance criteria, and task breakdown before implementation. Use when a feature request is vague, business rules are incomplete, more than one interpretation is genuinely plausible, the user asks to plan or spec a feature, or implementation would require guessing a decision that changes the result. Not for ordinary requests that are already clear enough to build.",
       "triggers": [
         "ambiguous",
         "unclear requirement",
@@ -665,9 +665,39 @@
       "has_description": true
     },
     {
+      "skill": "skill-authoring",
+      "version": 1,
+      "description": "Author, extend, or retire a GENTJIN skill safely. Use when creating a new skill, changing an existing skill's triggers or scope, deciding whether a new skill is justified, or auditing skills for overlapping triggers, contradictory rules, broken references, or recursive delegation.",
+      "triggers": [
+        "new skill",
+        "write a skill",
+        "edit a skill",
+        "author a skill",
+        "skill triggers",
+        "merge two skills"
+      ],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "allowed_actions": [
+        "read/search",
+        "diff inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "required_verification": [
+        "a verification command was actually executed",
+        "its exit code is recorded as observed evidence"
+      ],
+      "review_only": false,
+      "grants_code_change_authority": false,
+      "path": "skills/skill-authoring/SKILL.md",
+      "has_description": true
+    },
+    {
       "skill": "systematic-debugging",
       "version": 1,
-      "description": "Find the root cause of a defect with a disciplined reproduce-to-evidence-to-hypothesis-to-fix workflow. Use when something is broken, behavior is unexpected, a build or test suddenly fails, a regression is reported, data reaches the wrong process/session/component, the user asks \"why is this happening?\", or several attempted fixes have already failed.",
+      "description": "Find the root cause of a defect with a disciplined loop-to-evidence-to-hypothesis-to-fix workflow. Use when something is broken, behavior is unexpected, a build or test suddenly fails, a regression is reported, data reaches the wrong process/session/component, the user asks \"why is this happening?\", a symptom appears only intermittently, or several attempted fixes have already failed.",
       "triggers": [
         "bug",
         "broken",
@@ -697,7 +727,7 @@
     {
       "skill": "test-strategy",
       "version": 1,
-      "description": "Decide what should be tested and at which level before or during implementation. Use when implementing a meaningful feature, creating or changing tests, touching payment/auth/data-integrity logic, when a review finds insufficient verification, or when the user asks what needs testing. For an unexplained failure or regression, load `systematic-debugging` first to find the cause, then this skill to cover the fix.",
+      "description": "Decide what should be tested, at which seam, and at which level before or during implementation. Use when implementing a meaningful feature, creating or changing tests, building a behavior test-first, touching payment/auth/data-integrity logic, when a review finds insufficient verification, or when the user asks what needs testing. For an unexplained failure or regression, load `systematic-debugging` first to find the cause, then this skill to cover the fix.",
       "triggers": [
         "test coverage",
         "what to test",

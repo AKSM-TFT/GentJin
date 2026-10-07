@@ -33,6 +33,7 @@ Installation direction:
 <source-root>/plugins/**   -> <opencode-root>/plugins/**
 <source-root>/evals/**     -> <opencode-root>/evals/**
 <source-root>/scripts/**   -> <opencode-root>/scripts/**
+<source-root>/guardrails/** -> <opencode-root>/guardrails/**  (inert source; only /setup-git-guardrails places it into plugins/)
 <source-root>/docs/**      -> <opencode-root>/docs/**
 <source-root>/test/**      -> <opencode-root>/test/**
 installation metadata      -> <metadata-root>/manifest.json
@@ -363,6 +364,7 @@ command/learn-skills.md
 command/pause.md
 command/project-review.md
 command/report.md
+command/setup-git-guardrails.md
 command/resume.md
 command/status.md
 command/task.md
@@ -387,6 +389,7 @@ skills/reporting/SKILL.md
 skills/requirements-review/SKILL.md
 skills/review-orchestrator/SKILL.md
 skills/security-review/SKILL.md
+skills/skill-authoring/SKILL.md
 skills/systematic-debugging/SKILL.md
 skills/test-strategy/SKILL.md
 skills/work-in-progress/SKILL.md
@@ -399,15 +402,20 @@ src/routing/route.mjs
 src/memory/failure-awareness.mjs
 src/trace/writer.mjs
 src/trace/ids.mjs
+src/trace/plugin-body.mjs
+src/trace/plugin-support.mjs
+src/guardrails/git-guardrails.mjs
 registry/skills.json
-plugins/gentjin-trace.mjs
+plugins/gentjin-trace.js
 scripts/build-registry.mjs
 evals/run.mjs
 evals/cases.mjs
+evals/workflow-scenarios.mjs
 evals/graders/index.mjs
 evals/fixtures/unsafe-secrets.json
 docs/architecture.md
 docs/deferred.md
+docs/integration-map.md
 ```
 
 The payload is copied by directory, so new files are installed automatically.

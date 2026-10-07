@@ -3,6 +3,7 @@ import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 import { randomBytes } from "node:crypto"
 import { loadScenarios, contractCase, METRICS } from "./cases.mjs"
+import { runAll as runWorkflowScenarios } from "./workflow-scenarios.mjs"
 import { runGraders } from "./graders/index.mjs"
 import { validate } from "../src/schema/validate.mjs"
 import taskRecordSchema from "../schemas/task-record.schema.json" with { type: "json" }
@@ -99,6 +100,17 @@ function runContractGuards(runId) {
     name: "all eleven roadmap scenarios are defined",
     ok: scenarios.length >= 11,
     detail: `${scenarios.length} scenario(s): ${scenarios.map((s) => s.id).join(", ")}`,
+  })
+
+  const workflow = runWorkflowScenarios()
+  const failedWorkflow = workflow.filter((w) => !w.pass)
+  checks.push({
+    name: "workflow roadmap scenarios pass",
+    ok: failedWorkflow.length === 0,
+    detail:
+      failedWorkflow.length === 0
+        ? `${workflow.length}/14 pass`
+        : failedWorkflow.map((w) => `#${w.id} ${w.name}: ${w.detail}`).join("; "),
   })
 
   for (const scenario of scenarios) {

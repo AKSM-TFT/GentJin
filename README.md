@@ -266,6 +266,7 @@ Run `/update-gentjin` for normal updates. It uses `<user-home>/.config/opencode/
 | `/install-gentjin` | Install GENTJIN into your global OpenCode configuration. |
 | `/update-gentjin` | Update the installed GENTJIN copy from a newer repository state. |
 | `/learn-skills` | Load the full text of every installed skill into context for routing questions and corpus audits. |
+| `/setup-git-guardrails` | Install, verify, or remove the guardrail that blocks destructive git commands. Never installed automatically. |
 | `/cleanup` | Finish current work with QA, cleanup, and a final report. |
 | `/report` | Turn the current work into a clear, evidence-based report. |
 | `/status` | See the branch, pending changes, active WIP, and open questions. |
@@ -399,6 +400,7 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── project-review.md
 │   ├── report.md
 │   ├── resume.md
+│   ├── setup-git-guardrails.md
 │   ├── status.md
 │   ├── task.md
 │   └── update-gentjin.md
@@ -423,29 +425,35 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── requirements-review/
 │   ├── review-orchestrator/
 │   ├── security-review/
+│   ├── skill-authoring/
 │   ├── systematic-debugging/
 │   ├── test-strategy/
 │   └── work-in-progress/
 ├── schemas/                   Portable JSON Schema contracts
 │   ├── task-record.schema.json
 │   └── task-event.schema.json
+├── guardrails/                Opt-in git guardrail plugin, not auto-installed
 ├── src/                       Enforcement layer (Node 24, zero dependencies)
 │   ├── schema/validate.mjs    JSON Schema subset validator
 │   ├── task/record.mjs        Lifecycle, states, action capture
 │   ├── task/completion-gate.mjs
 │   ├── routing/route.mjs      Routing, scope and capability contracts
 │   ├── memory/failure-awareness.mjs
-│   └── trace/writer.mjs       JSONL traces, redaction, coverage
+│   ├── trace/writer.mjs       JSONL traces, redaction, coverage
+│   ├── trace/plugin-body.mjs  Trace plugin implementation
+│   ├── trace/plugin-support.mjs
+│   └── guardrails/git-guardrails.mjs
 ├── registry/skills.json       Generated skill and capability registry
-├── plugins/gentjin-trace.mjs  Trace plugin using real OpenCode hooks
+├── plugins/gentjin-trace.js  Trace plugin using real OpenCode hooks
 ├── scripts/build-registry.mjs
 ├── evals/                     Executable evaluation suite
 │   ├── run.mjs                Contract and live modes
 │   ├── cases.mjs
+│   ├── workflow-scenarios.mjs 14 roadmap scenario checks
 │   ├── graders/index.mjs
 │   ├── scenarios/             11 scenario definitions
 │   └── fixtures/              Synthetic, non-secret data only
-├── test/                      88 unit and contract tests
+├── test/                      117 unit and contract tests
 ├── docs/
 │   ├── architecture.md
 │   └── deferred.md
