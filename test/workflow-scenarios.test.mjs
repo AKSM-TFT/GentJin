@@ -8,8 +8,8 @@ test("the roadmap's fourteen required scenarios are all defined", () => {
   assert.deepEqual(ids, Array.from({ length: 14 }, (_, i) => i + 1))
 })
 
-test("every required scenario passes", () => {
-  for (const result of runAll()) {
+test("every required scenario passes", async () => {
+  for (const result of await runAll()) {
     assert.equal(result.pass, true, `scenario ${result.id} failed: ${result.detail}`)
   }
 })

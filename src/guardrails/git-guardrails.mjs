@@ -72,7 +72,7 @@ export function evaluateGitCommand(command) {
 export const guardrailRules = BLOCKED.map((r) => ({ id: r.id, why: r.why }))
 
 /**
- * OpenCode 1.18.34 discovers only .js and .ts files and invokes only an inline
+ * OpenCode 1.18.35 discovers only .js and .ts files and invokes only an inline
  * default export. Extra named exports suppress invocation, so the plugin entry
  * point delegates to this module instead of defining the hooks here.
  */

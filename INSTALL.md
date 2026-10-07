@@ -29,6 +29,8 @@ Installation direction:
 <source-root>/skills/**    -> <opencode-root>/skills/**
 <source-root>/schemas/**   -> <opencode-root>/schemas/**
 <source-root>/src/**       -> <opencode-root>/src/**
+<source-root>/plugins/** -> <opencode-root>/plugins/**
+<source-root>/package.json -> <opencode-root>/package.json
 <source-root>/registry/**  -> <opencode-root>/registry/**
 <source-root>/plugins/**   -> <opencode-root>/plugins/**
 <source-root>/evals/**     -> <opencode-root>/evals/**
@@ -405,9 +407,17 @@ src/trace/ids.mjs
 src/trace/plugin-body.mjs
 src/trace/plugin-support.mjs
 src/guardrails/git-guardrails.mjs
+src/capabilities/registry.mjs
+src/capabilities/resolve.mjs
+src/capabilities/loader.mjs
+src/capabilities/loader.d.mts
+src/capabilities/adherence.mjs
 registry/skills.json
+registry/capabilities.json
 plugins/gentjin-trace.js
+plugins/gentjin-capabilities.ts
 scripts/build-registry.mjs
+scripts/build-capabilities.mjs
 evals/run.mjs
 evals/cases.mjs
 evals/workflow-scenarios.mjs

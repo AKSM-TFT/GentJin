@@ -5,6 +5,8 @@ import { randomBytes } from "node:crypto"
 import { loadScenarios, contractCase, METRICS } from "./cases.mjs"
 import { runAll as runWorkflowScenarios } from "./workflow-scenarios.mjs"
 import { checkChangeDescription } from "../src/reporting/change-description.mjs"
+import { buildCapabilityRegistry } from "../src/capabilities/registry.mjs"
+import { resolveCapability } from "../src/capabilities/resolve.mjs"
 import { runGraders } from "./graders/index.mjs"
 import { validate } from "../src/schema/validate.mjs"
 import taskRecordSchema from "../schemas/task-record.schema.json" with { type: "json" }
@@ -78,7 +80,54 @@ function checkDescriptionContracts() {
   return cases.map((c) => ({ ...c, detail: c.ok ? "as expected" : "unexpected result" }))
 }
 
-function runContractGuards(runId) {
+function checkCapabilityRouting() {
+  const registry = buildCapabilityRegistry(process.cwd())
+
+  const expects = [
+    ["Update GentJin", "command", "update-gentjin"],
+    ["Please refresh my GentJin installation", "command", "update-gentjin"],
+    ["update the genthin, meaning the installed skill suite", "command", "update-gentjin"],
+    ["Install GentJin", "command", "install-gentjin"],
+    ["Investigate why this table is empty.", "skill", "systematic-debugging"],
+    ["Review my changes", "command", "changes-review"],
+    ["Review the whole project", "command", "project-review"],
+    ["Push my changes", "command", "git-push"],
+    ["Make a report of what changed", "command", "report"],
+    ["Pause here; continue tomorrow", "command", "pause"],
+    ["Continue where we stopped", "command", "resume"],
+    ["Learn the skills", "command", "learn-skills"],
+  ]
+
+  const exclusions = [
+    "What does /update-gentjin do?",
+    "Do not update GentJin; explain the steps",
+    'the transcript said "update gentjin" but that was only quoted',
+    "Update this dependency",
+    "Review the GentJin README",
+    "Review only; do not edit anything",
+  ]
+
+  const results = expects.map(([request, kind, id]) => {
+    const decision = resolveCapability(registry, request)
+    const ok = decision.resolved && decision.id === id && decision.kind === kind
+    return { request, resolved: true, ok, detail: ok ? `${decision.kind} ${decision.id}` : `got ${decision.id ?? decision.reason}` }
+  })
+
+  for (const request of exclusions) {
+    const decision = resolveCapability(registry, request)
+    const ok = decision.resolved === false
+    results.push({
+      request,
+      resolved: false,
+      ok,
+      detail: ok ? decision.reason : `wrongly resolved to ${decision.id}`,
+    })
+  }
+
+  return results
+}
+
+async function runContractGuards(runId) {
   const checks = []
 
   const registry = buildRegistry()
@@ -141,7 +190,18 @@ function runContractGuards(runId) {
         : failedContracts.map((c) => c.name + ": " + c.detail).join("; "),
   })
 
-  const workflow = runWorkflowScenarios()
+  const capability = checkCapabilityRouting()
+  const badCapability = capability.filter((c) => !c.ok)
+  checks.push({
+    name: "no-slash capability routing",
+    ok: badCapability.length === 0,
+    detail:
+      badCapability.length === 0
+        ? `${capability.filter((c) => c.resolved).length} resolved, ${capability.filter((c) => !c.resolved).length} correctly excluded`
+        : badCapability.map((c) => `${c.request}: ${c.detail}`).join("; "),
+  })
+
+  const workflow = await runWorkflowScenarios()
   const failedWorkflow = workflow.filter((w) => !w.pass)
   checks.push({
     name: "workflow roadmap scenarios pass",
@@ -334,7 +394,7 @@ async function main() {
   console.log(`mode: ${args.mode}${args.baseline ? " (baseline: --pure, GENTJIN disabled)" : ""}`)
   console.log("")
 
-  const guards = runContractGuards(runId)
+  const guards = await runContractGuards(runId)
   console.log("Contract guards")
   for (const check of guards.checks) {
     console.log(`  ${check.ok ? "PASS" : "FAIL"}  ${check.name}`)

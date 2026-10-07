@@ -1,5 +1,6 @@
 import taskRecordSchema from "../../schemas/task-record.schema.json" with { type: "json" }
 import { validate } from "../schema/validate.mjs"
+import { RESOLUTION, resolveEvidence } from "./evidence-resolution.mjs"
 
 const FAILING = new Set(["fail", "not_run"])
 
@@ -114,6 +115,42 @@ export function evaluateCompletion(record, options = {}) {
   if (record.state === "completed" && record.routing?.basis === "observed" && !options.routingObserved) {
     reasons.push("routing basis claims 'observed' but skill selection fires no hook; must be 'inferred'")
     blocking.push("__routing_basis__")
+  }
+
+  if (record.state === "completed" || record.outcome.result === "success") {
+    const resolution = resolveEvidence({
+      record,
+      events: options.traces,
+      sessionId: options.sessionId ?? null,
+    })
+
+    for (const finding of resolution.findings) {
+      if (finding.ok) {
+        notes.push(`evidence ${finding.reference}: ${finding.reason}`)
+        continue
+      }
+      reasons.push(`evidence ${finding.reference} is not verified: ${finding.reason}`)
+      if (resolution.status === RESOLUTION.REJECTED) blocking.push("__evidence__")
+      else blocking.push("__evidence_pending__")
+    }
+  }
+
+  const open = (record.reconciliation ?? []).filter((r) => r.resolved_at === null)
+  if (record.state === "completed" && open.length > 0) {
+    reasons.push(
+      `completed while ${open.length} bypassed workflow(s) still need reconciliation: ` +
+        open
+          .map((r) => `${r.capability} (${r.trigger}) needs ${r.checks_needed.join(", ")}`)
+          .join("; "),
+    )
+    blocking.push("__reconciliation__")
+  }
+
+  for (const id of options.adherence?.required ?? []) {
+    const findings = options.adherence.check(id)
+    if (findings.ok) continue
+    reasons.push(...findings.reasons)
+    blocking.push(`__adherence_${id}__`)
   }
 
   return finish(true)

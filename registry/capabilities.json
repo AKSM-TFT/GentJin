@@ -1,0 +1,1090 @@
+{
+  "schema_version": 1,
+  "generated_from": "skills/*/SKILL.md and command/*.md frontmatter",
+  "generated_by": "scripts/build-capabilities.mjs",
+  "kinds": [
+    "skill",
+    "command"
+  ],
+  "loading": {
+    "mechanism": "A capability is selected first, then its canonical file body is read before any action it governs.",
+    "note": "Selection alone is not loading, and loading is not following. Each is recorded separately in the adherence state."
+  },
+  "capabilities": [
+    {
+      "id": "changes-review",
+      "kind": "command",
+      "path": "command/changes-review.md",
+      "description": "Review the current changes and their impact radius, report evidence-based findings, and suggest fixes without modifying the project until you approve them.",
+      "intent": [
+        "review what i changed",
+        "review my changes",
+        "review my recent diff",
+        "review the diff"
+      ],
+      "aliases": [
+        "/changes-review"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [
+        "\"review only, do not edit\" keeps the workflow read-only"
+      ],
+      "waivable_steps": []
+    },
+    {
+      "id": "cleanup",
+      "kind": "command",
+      "path": "command/cleanup.md",
+      "description": "Full pre-main-branch cleanup, QA, debugging, testing, optimization, and production-readiness review, ending with a cleanup report.",
+      "intent": [
+        "clean up the code",
+        "before merge cleanup"
+      ],
+      "aliases": [
+        "/cleanup"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "deployment-check",
+      "kind": "command",
+      "path": "command/deployment-check.md",
+      "description": "Analyze the current project's deployment readiness using the `deployment-readiness` skill, report blockers and warnings, and provide suggested next steps. The command does not modify the project unless the user explicitly approves a recommended implementation afterward.",
+      "intent": [
+        "deployment readiness",
+        "ready to deploy"
+      ],
+      "aliases": [
+        "/deployment-check"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "git-push",
+      "kind": "command",
+      "path": "command/git-push.md",
+      "description": "Commit and push the current changes on a new branch, detecting the repository's branch naming format first, proposing a name, deriving the Jira backlog title, and asking for approval (with the option to type your own).",
+      "intent": [
+        "push my changes",
+        "commit and push",
+        "prepare my changes for push",
+        "push this branch"
+      ],
+      "aliases": [
+        "/git-push"
+      ],
+      "prerequisites": [],
+      "scope": "mutating_workflow",
+      "grants_code_change_authority": true,
+      "review_only": false,
+      "guarded": true,
+      "guarded_reason": "creates branches, commits, and pushes to a remote",
+      "required_preconditions": [
+        "branch approved",
+        "cleanup gate passed",
+        "commit body checked"
+      ],
+      "allowed_actions": [
+        "read",
+        "local edits to the installation",
+        "version control",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "install-gentjin",
+      "kind": "command",
+      "path": "command/install-gentjin.md",
+      "description": "Install GENTJIN directly into OpenCode's native runtime directories, with metadata-only tracking, guarded vault migration, and verification.",
+      "intent": [
+        "install gentjin",
+        "set up gentjin",
+        "first time install gentjin"
+      ],
+      "aliases": [
+        "/install-gentjin"
+      ],
+      "prerequisites": [],
+      "scope": "mutating_workflow",
+      "grants_code_change_authority": true,
+      "review_only": false,
+      "guarded": true,
+      "guarded_reason": "mutates the installed GENTJIN payload and metadata",
+      "required_preconditions": [
+        "source resolved",
+        "payload installed",
+        "verification passed"
+      ],
+      "allowed_actions": [
+        "read",
+        "local edits to the installation",
+        "version control",
+        "reporting"
+      ],
+      "exclusions": [
+        "re-running install when an installation already exists is an update, not a first install"
+      ],
+      "waivable_steps": []
+    },
+    {
+      "id": "learn-skills",
+      "kind": "command",
+      "path": "command/learn-skills.md",
+      "description": "Load the full text of every installed GENTJIN skill into the current context so routing, skill boundaries, and skill contents are known rather than inferred from descriptions. Use when the user asks to learn the skills, load all skills, read all skills, explain what each skill does, or check for gaps or overlap between skills.",
+      "intent": [
+        "learn the skills",
+        "load all skills",
+        "read all skills",
+        "what skills do you have"
+      ],
+      "aliases": [
+        "/learn-skills"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "pause",
+      "kind": "command",
+      "path": "command/pause.md",
+      "description": "Bring the active WIP current, flush outstanding durable knowledge, record one next action, and verify persistence before stopping work.",
+      "intent": [
+        "pause here",
+        "save our progress",
+        "continue later",
+        "stop for now"
+      ],
+      "aliases": [
+        "/pause"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "project-review",
+      "kind": "command",
+      "path": "command/project-review.md",
+      "description": "After confirmation, perform a comprehensive read-only review of the entire relevant project and suggest improvements before any changes are made.",
+      "intent": [
+        "review the whole project",
+        "full project review"
+      ],
+      "aliases": [
+        "/project-review"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [
+        "reports findings without applying fixes"
+      ],
+      "waivable_steps": []
+    },
+    {
+      "id": "report",
+      "kind": "command",
+      "path": "command/report.md",
+      "description": "Create a change report (vault report + concise console report). Report only; no cleanup performed.",
+      "intent": [
+        "make a report",
+        "report of what changed",
+        "write up the changes"
+      ],
+      "aliases": [
+        "/report"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "resume",
+      "kind": "command",
+      "path": "command/resume.md",
+      "description": "Reload the active WIP and relevant knowledge, verify them against current source, and continue from the recorded next action.",
+      "intent": [
+        "continue where we left off",
+        "resume",
+        "continue previous work",
+        "where we stopped"
+      ],
+      "aliases": [
+        "/resume"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "setup-git-guardrails",
+      "kind": "command",
+      "path": "command/setup-git-guardrails.md",
+      "description": "Install, verify, or remove the GENTJIN git guardrail that blocks destructive git commands through the OpenCode tool.execute.before hook. Use when the user asks to add git safety guardrails, block dangerous git commands, verify the guardrail is active, or remove it.",
+      "intent": [
+        "add git guardrails",
+        "block dangerous git commands",
+        "git safety hooks"
+      ],
+      "aliases": [
+        "/setup-git-guardrails"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "status",
+      "kind": "command",
+      "path": "command/status.md",
+      "description": "Report the current branch, pending changes, active WIP notes, and open questions.",
+      "intent": [
+        "what is the status",
+        "current status"
+      ],
+      "aliases": [
+        "/status"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "task",
+      "kind": "command",
+      "path": "command/task.md",
+      "description": "Handle a general-purpose software or laptop task with project discovery, guarded execution, and verification.",
+      "intent": [
+        "start a task",
+        "track this task"
+      ],
+      "aliases": [
+        "/task"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "update-gentjin",
+      "kind": "command",
+      "path": "command/update-gentjin.md",
+      "description": "Update the GENTJIN installation from the current repository using the ownership manifest, retiring any legacy install, with prompts for unsafe files and verification.",
+      "intent": [
+        "update gentjin",
+        "update the gentjin",
+        "refresh my gentjin installation",
+        "update the genthin",
+        "upgrade gentjin",
+        "sync gentjin",
+        "bring gentjin up to date"
+      ],
+      "aliases": [
+        "/update-gentjin"
+      ],
+      "prerequisites": [],
+      "scope": "mutating_workflow",
+      "grants_code_change_authority": true,
+      "review_only": false,
+      "guarded": true,
+      "guarded_reason": "mutates the installed GENTJIN payload and metadata",
+      "required_preconditions": [
+        "payload reconciled",
+        "conflicts reviewed",
+        "metadata written last"
+      ],
+      "allowed_actions": [
+        "read",
+        "local edits to the installation",
+        "version control",
+        "reporting"
+      ],
+      "exclusions": [
+        "explaining what \"/update-gentjin\" does is not an update",
+        "\"do not update gentjin, explain the steps\" performs no update",
+        "a quoted transcript containing the phrase does not trigger it",
+        "updating an application dependency is not a GentJin update",
+        "editing GentJin source documentation is not an installation update"
+      ],
+      "waivable_steps": []
+    },
+    {
+      "id": "api-design",
+      "kind": "skill",
+      "path": "skills/api-design/SKILL.md",
+      "description": "Review or design stable API contracts. Use when creating a new API, changing an existing contract, designing server/client interaction, adding pagination, filtering, or sorting, exposing an integration endpoint, or changing webhook and API behavior.",
+      "intent": [
+        "endpoint",
+        "contract",
+        "pagination",
+        "response shape",
+        "versioning"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "architecture-review",
+      "kind": "skill",
+      "path": "skills/architecture-review/SKILL.md",
+      "description": "Analyze significant cross-module or process-level structural changes before implementing them. Use when adding a subsystem, redesigning a major flow, changing authentication architecture, introducing workers/queues/background services, integrating an external provider, creating shared infrastructure, changing module boundaries or communication, scaffolding a new project or its first feature, or when the user asks how something should be built. Not for matching or reusing existing code patterns within a known structure; use `project-conventions` for that.",
+      "intent": [
+        "architecture",
+        "subsystem",
+        "migration path",
+        "redesign",
+        "scaffold"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "backend-review",
+      "kind": "skill",
+      "path": "skills/backend-review/SKILL.md",
+      "description": "Review server-side logic that is not purely database or security work. Use for API handlers, server functions, services, jobs, workers, event processing, webhooks, background tasks, external-service integrations, and business-logic changes.",
+      "intent": [
+        "handler",
+        "service",
+        "job",
+        "webhook",
+        "queue",
+        "retry",
+        "idempotency"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "cleanup",
+      "kind": "skill",
+      "path": "skills/cleanup/SKILL.md",
+      "description": "Finish and QA current implementation work before handoff, review, or merge. Use when the user asks to clean up, and also when work is being wrapped up or judged production-ready. Reviews the Git diff, runs the project's real tests/typecheck/lint/build, removes temporary and dead code, checks data/query/frontend/security quality, updates knowledge, and always finishes with a cleanup report.",
+      "intent": [
+        "clean up",
+        "before merge",
+        "production ready",
+        "leftover debug"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "compaction",
+      "kind": "skill",
+      "path": "skills/compaction/SKILL.md",
+      "description": "Condense older conversation and work context into a small, accurate working summary when context grows large. MUST be used when repeated discussion, obsolete reasoning, explored-and-discarded paths, or topic drift obscure the current goal, before a pause, or when rebuilding context after interruption. Cooperates with work-in-progress for unfinished task state and knowledge-vault for durable knowledge; never replaces either or stores permanent truth.",
+      "intent": [
+        "context too large",
+        "condense context",
+        "topic drift"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "database-review",
+      "kind": "skill",
+      "path": "skills/database-review/SKILL.md",
+      "description": "Review database, query, schema, migration, and data-layer changes for correctness, query-level performance, authorization, data integrity, and connection failures. MUST be used before creating or modifying schema or migrations, before any database write, and whenever queries or data access change, including during cleanup. Not for handler, service, job, retry, or idempotency concerns; use `backend-review` for those.",
+      "intent": [
+        "sql",
+        "schema",
+        "query",
+        "migration",
+        "index",
+        "data integrity"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "dependency-review",
+      "kind": "skill",
+      "path": "skills/dependency-review/SKILL.md",
+      "description": "Safely evaluate dependency additions, upgrades, and replacements. Use when adding a package, upgrading dependencies, replacing a library, responding to an audit finding, or changing framework and runtime versions.",
+      "intent": [
+        "add a package",
+        "upgrade dependency",
+        "replace library",
+        "audit finding"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "deployment-readiness",
+      "kind": "skill",
+      "path": "skills/deployment-readiness/SKILL.md",
+      "description": "Assess whether a project is safe to ship to production. Use when the user asks about deployment, release, production readiness, going live, launch safety, environment or config parity, CI/CD pipelines, rollback plans, migration safety before shipping, or secret and credential exposure. Also use when release or deployment-sensitive work is being finished. Delegate per-layer code correctness to the review skills; this skill owns the ship-readiness question.",
+      "intent": [
+        "deploy",
+        "release",
+        "production",
+        "rollback",
+        "readiness"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "frontend-review",
+      "kind": "skill",
+      "path": "skills/frontend-review/SKILL.md",
+      "description": "Review changed frontend/UI code for responsive design, UX consistency, accessibility, optimistic interactions, loading/error/empty states, real data usage, and frontend performance. Use for UI changes, frontend QA, responsive/mobile review, or as part of cleanup when user-facing screens changed.",
+      "intent": [
+        "ui",
+        "responsive",
+        "accessibility",
+        "render",
+        "layout",
+        "css"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "git-workflow",
+      "kind": "skill",
+      "path": "skills/git-workflow/SKILL.md",
+      "description": "Handle guarded Git and source-control workflows. MUST be used before any commit, branch creation, push, merge, rebase, or pull request. Use when inspecting repository status/history/diffs, matching repository commit and branch conventions, or when cleanup/reporting needs source-control evidence. Never performs mutating Git actions unless explicitly requested.",
+      "intent": [
+        "commit",
+        "branch",
+        "push",
+        "merge",
+        "git status",
+        "git diff"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "incident-response",
+      "kind": "skill",
+      "path": "skills/incident-response/SKILL.md",
+      "description": "Diagnose and resolve production incidents where users are already affected. Use when something is broken in production, error rates spiked, an outage or degraded service is reported, a deploy went wrong, customers report failures, or the user asks to roll back, hotfix, or restore service. Pairs with systematic-debugging for the root cause but owns the live-impact and mitigation path.",
+      "intent": [
+        "outage",
+        "incident",
+        "down",
+        "latency spike",
+        "error rate"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "integration-review",
+      "kind": "skill",
+      "path": "skills/integration-review/SKILL.md",
+      "description": "Catch defects that appear where two or more layers meet, which per-layer review misses. Use when a change crosses boundaries such as frontend to API, API to service, service to database, auth to route authorization, webhook to database, worker to API, payment provider to frontend, or any external provider to internal state.",
+      "intent": [
+        "seam",
+        "cross-layer",
+        "integration defect"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "knowledge-vault",
+      "kind": "skill",
+      "path": "skills/knowledge-vault/SKILL.md",
+      "description": "Manage persistent project knowledge in the user's Knowledge Vault, including project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration. MUST be used when durable knowledge is established during a task, even when the user never asks for notes, and when the user says \"remember this\", \"save this workflow\", or \"don't do that again\". This is a core GENTJIN system, not an optional extra: prefer capturing a useful note over skipping one. Never store transcripts, secrets, or cheap-to-rediscover information.",
+      "intent": [
+        "remember",
+        "knowledge vault",
+        "what did we decide",
+        "prior session"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "performance-review",
+      "kind": "skill",
+      "path": "skills/performance-review/SKILL.md",
+      "description": "Find real performance problems using measurement instead of speculation. Use when performance is reported as an issue, the user asks for optimization, a review spots potentially expensive behavior, or a change is suspected of causing a measurable slowdown. Owns cross-stack methodology for caching, N+1 behavior, and resource leaks; use `frontend-review` for render performance and `database-review` for query cost.",
+      "intent": [
+        "slow",
+        "latency",
+        "throughput",
+        "n+1",
+        "memory leak",
+        "optimize"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "project-conventions",
+      "kind": "skill",
+      "path": "skills/project-conventions/SKILL.md",
+      "description": "Learn an existing codebase before changing it, then match its conventions, write human-readable self-documenting code without added comments, and reuse what already exists. MUST be used before implementing meaningful changes in an existing project, and when creating any component, route, endpoint, server function, hook, query, validation helper, or utility. Also use when new code could plausibly duplicate an existing implementation.",
+      "intent": [
+        "existing codebase",
+        "match conventions",
+        "reuse existing"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "refactoring-migration",
+      "kind": "skill",
+      "path": "skills/refactoring-migration/SKILL.md",
+      "description": "Execute a large-scale refactor, migration, or architecture change safely across an existing codebase. Use when changing a data shape, moving a service or module, dual-writing, expand-contract, introducing or retiring a feature flag, deprecating an API or table, backfilling data, strangler-fig transitions, or changing a contract that existing consumers depend on. Owns the staged execution path; use architecture-review for the design decision and project-conventions for matching existing style.",
+      "intent": [
+        "refactor",
+        "migrate",
+        "dual-write",
+        "backfill",
+        "deprecate"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "reporting",
+      "kind": "skill",
+      "path": "skills/reporting/SKILL.md",
+      "description": "Create project change, implementation, QA, debug, review, or cleanup reports. Use when the user asks create/write/generate/prepare a report, document changes, summarize implementation changes, or when cleanup requires its mandatory final report. Uses Git/session/vault evidence and produces a vault report plus concise console report.",
+      "intent": [
+        "write a report",
+        "change summary",
+        "document the changes"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "requirements-review",
+      "kind": "skill",
+      "path": "skills/requirements-review/SKILL.md",
+      "description": "Clarify ambiguous requests, missing constraints, conflicting rules, acceptance criteria, and task breakdown before implementation. Use when a feature request is vague, business rules are incomplete, more than one interpretation is genuinely plausible, the user asks to plan or spec a feature, or implementation would require guessing a decision that changes the result. Not for ordinary requests that are already clear enough to build.",
+      "intent": [
+        "ambiguous",
+        "acceptance criteria",
+        "conflicting rules"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "review-orchestrator",
+      "kind": "skill",
+      "path": "skills/review-orchestrator/SKILL.md",
+      "description": "Shared comprehensive review engine for the review commands. Use when `/changes-review` or `/project-review` is invoked, or when the user explicitly asks for a full multi-layer or whole-codebase review, to map scope, delegate to the relevant specialized skills, and produce one evidence-based report. Not for single-file or single-layer review; use the specific review skill directly.",
+      "intent": [
+        "full review",
+        "whole project",
+        "comprehensive review"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "security-review",
+      "kind": "skill",
+      "path": "skills/security-review/SKILL.md",
+      "description": "Review changed code for application security and data-integrity risks. Use for authentication, authorization, user-owned records, external input, secrets/tokens, sensitive logs, mutations, payments, permissions, downloaded/untrusted code, or cleanup of security-sensitive changes.",
+      "intent": [
+        "auth",
+        "secret",
+        "token",
+        "credential",
+        "injection",
+        "pii",
+        "permission"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "skill-authoring",
+      "kind": "skill",
+      "path": "skills/skill-authoring/SKILL.md",
+      "description": "Author, extend, or retire a GENTJIN skill safely. Use when creating a new skill, changing an existing skill's triggers or scope, deciding whether a new skill is justified, or auditing skills for overlapping triggers, contradictory rules, broken references, or recursive delegation.",
+      "intent": [
+        "new skill",
+        "author a skill",
+        "skill triggers",
+        "merge two skills"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "systematic-debugging",
+      "kind": "skill",
+      "path": "skills/systematic-debugging/SKILL.md",
+      "description": "Find the root cause of a defect with a disciplined loop-to-evidence-to-hypothesis-to-fix workflow. Use when something is broken, behavior is unexpected, a build or test suddenly fails, a regression is reported, data reaches the wrong process/session/component, the user asks \"why is this happening?\", a symptom appears only intermittently, or several attempted fixes have already failed.",
+      "intent": [
+        "bug",
+        "broken",
+        "regression",
+        "not working",
+        "why is this happening",
+        "fails",
+        "investigate why",
+        "why is this table is empty",
+        "data is returned but",
+        "renders no rows",
+        "no table rows appear",
+        "why is it empty",
+        "this is empty",
+        "diagnose",
+        "debug this",
+        "something is broken",
+        "throws",
+        "unexpected behavior"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "test-strategy",
+      "kind": "skill",
+      "path": "skills/test-strategy/SKILL.md",
+      "description": "Decide what should be tested, at which seam, and at which level before or during implementation. Use when implementing a meaningful feature, creating or changing tests, building a behavior test-first, touching payment/auth/data-integrity logic, when a review finds insufficient verification, or when the user asks what needs testing. For an unexplained failure or regression, load `systematic-debugging` first to find the cause, then this skill to cover the fix.",
+      "intent": [
+        "test coverage",
+        "what to test",
+        "regression test"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "review_and_report",
+      "grants_code_change_authority": false,
+      "review_only": true,
+      "guarded": false,
+      "allowed_actions": [
+        "read",
+        "search",
+        "diff_inspection",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
+      "id": "work-in-progress",
+      "kind": "skill",
+      "path": "skills/work-in-progress/SKILL.md",
+      "description": "Preserve and resume unfinished development work. MUST be used when the user pauses, holds, stops for now, or asks to continue previous work, and at meaningful milestones during substantial unfinished work, even without an explicit request. Use when work spans sessions, is blocked, or meaningful implementation remains. This is a core GENTJIN system, not an optional extra: keep the active state current rather than reconstructing it later. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.",
+      "intent": [
+        "pause",
+        "stop for now",
+        "continue later",
+        "resume",
+        "unfinished work"
+      ],
+      "aliases": [],
+      "prerequisites": [],
+      "scope": "implement_and_verify",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "allowed_actions": [
+        "read/search",
+        "diff_inspection",
+        "local edits",
+        "verification commands",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    }
+  ]
+}
