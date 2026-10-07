@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url"
 import { randomBytes } from "node:crypto"
 import { loadScenarios, contractCase, METRICS } from "./cases.mjs"
 import { runAll as runWorkflowScenarios } from "./workflow-scenarios.mjs"
+import { checkChangeDescription } from "../src/reporting/change-description.mjs"
 import { runGraders } from "./graders/index.mjs"
 import { validate } from "../src/schema/validate.mjs"
 import taskRecordSchema from "../schemas/task-record.schema.json" with { type: "json" }
@@ -49,6 +50,33 @@ Exit codes:
 A contract pass is NOT evidence of live agent performance. Results are labeled
 accordingly and are never merged into a single score.
 `
+
+function checkDescriptionContracts() {
+  const verboseParagraph = Array.from({ length: 60 }, () => "word").join(" ")
+  const verbose = [
+    "The trace plugin had never run once.",
+    "",
+    "1. Fixed tracing.",
+    "",
+    "Root Cause:",
+    "The loader only discovers .js files in plugins/, so the .mjs entry was ignored at",
+    "startup, which meant no trace events were ever written and the coverage report",
+    "always showed zero observed hooks throughout the entire investigation period.",
+  ].join("\n")
+
+  const listThenParagraph = ["Summary line.", "", "1. Fixed tracing.", "", "Root Cause:", verboseParagraph].join("\n")
+  const cleanBody = ["Improves the workflow.", "", "1. Improved the push report."].join("\n")
+  const bodyWithAuditSections = ["Improves the workflow.", "", "1. Improved the push report.", "Notes", "2. leaked"].join("\n")
+
+  const cases = [
+    { name: "verbose narrative rejected", ok: checkChangeDescription(verbose).ok === false },
+    { name: "numbered list plus long paragraph rejected", ok: checkChangeDescription(listThenParagraph).ok === false },
+    { name: "clean body accepted", ok: checkChangeDescription(cleanBody).ok === true },
+    { name: "console audit sections rejected", ok: checkChangeDescription(bodyWithAuditSections).ok === false },
+  ]
+
+  return cases.map((c) => ({ ...c, detail: c.ok ? "as expected" : "unexpected result" }))
+}
 
 function runContractGuards(runId) {
   const checks = []
@@ -100,6 +128,17 @@ function runContractGuards(runId) {
     name: "all eleven roadmap scenarios are defined",
     ok: scenarios.length >= 11,
     detail: `${scenarios.length} scenario(s): ${scenarios.map((s) => s.id).join(", ")}`,
+  })
+
+  const contracts = checkDescriptionContracts()
+  const failedContracts = contracts.filter((c) => !c.ok)
+  checks.push({
+    name: "change description contracts",
+    ok: failedContracts.length === 0,
+    detail:
+      failedContracts.length === 0
+        ? contracts.map((c) => c.name).join("; ")
+        : failedContracts.map((c) => c.name + ": " + c.detail).join("; "),
   })
 
   const workflow = runWorkflowScenarios()

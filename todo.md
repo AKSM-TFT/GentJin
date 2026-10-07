@@ -1,251 +1,134 @@
-# TODO — GentJin Engineering Workflow Improvements
+TODO — Fix concise commit bodies and manually created PR descriptions
+User requirement
+When the user manually opens a GitHub pull request after pushing a branch, the description should be a short summary followed by a concise numbered list of meaningful changes.
+Use plain-language outcomes. Do not fill the description with investigation history, implementation details, or long verification reports.
+This is a focused follow-up to existing Git reporting rules, not another workflow redesign.
+Findings verified before writing this TODO
+Inspected GentJin default-branch commit:
+04cd612b50e8fb182c9911c6d4b44a750e829b6f
+It merges PR #17 from GJ-15-engineering-workflow-and-git-guardrails.
 
-## Objective
+1. command/git-push.md, under "Branch Description", already requires a concise numbered list, normally 3–10 items, without file paths, function names, or long technical paragraphs.
+2. skills/git-workflow/SKILL.md repeats that requirement.
+3. The "Commits" section only asks for a short subject and a concise explanatory body; it does not explicitly apply the numbered change-summary format to that body.
+4. The source branch's commit d5780846798442438356508928c4e44fdabb860f contains the exact long description reported by the user, including the plugin investigation, guardrail implementation, and verification counts.
+5. The /git-push execution steps do not explicitly generate, inspect, and deliver the concise PR body before committing/pushing.
+6. The existing git-reporting evaluation checks a report for numbered lines and sections. That does not establish whether a commit body or actual PR description meets this requirement.
+   GitHub documents that when a PR comparison contains one commit, the suggested title and description come from that commit's subject and body:
+   https://github.blog/changelog/2022-09-06-better-suggested-pull-request-description-from-commit-message/
+   Therefore the supplied commit body explains the observed prefilled text. The UI session and installed OpenCode runtime were not inspected; do not claim a separate runtime defect was proved.
+   Scope and constraints
 
-Improve GENTJIN's modular OpenCode workflow using selected engineering ideas from:
+- [x] Inspect current source again; commits above are the inspection baseline, not a requirement to restore an older revision.
+- [x] Read applicable instructions and relevant Git/reporting knowledge.
+- [x] Update the existing command and skill. Do not create a duplicate git-push skill.
+- [x] Preserve branch naming, approval, artifact cleanup, verification honesty, Git permissions, and Vault capture behavior.
+- [x] Keep detailed implementation/root-cause/verification records in the existing audit or Vault.
+- [x] Do not change unrelated skills or application behavior.
+- [x] No new dependencies by default.
+- [x] Do not rewrite existing shared commits, force-push, publish a release, or edit old PRs to solve this.
+- [x] This TODO authorizes source changes and isolated verification, not remote pushes or PR creation.
 
-- GentJin: https://github.com/frnkgns/GentJin
-- Reference: https://github.com/mattpocock/skills
+1. Establish one shared output contract
+   Apply the following default to:
 
-Adapt useful concepts to GentJin's architecture, Obsidian Knowledge Vault, and existing rules. Do not install or copy the entire reference suite.
+- the body of a new push-workflow commit;
+- any proposed or explicitly authorized PR description;
+- the ready-to-paste description supplied when the user will create the PR manually.
+  Format:
+  <One short sentence summarizing the change, if useful.>
 
-This TODO authorizes implementing the improvements below in the GentJin source repository. It does not authorize pushing, publishing, deploying, changing account settings, or overwriting a user's global OpenCode installation.
+1. <Concrete change and observable outcome.>
+2. <Another distinct change.>
+3. <Another distinct change.>
+   Rules:
 
-## Execution rules
+- [x] Prefer 3–10 numbered items for a substantial change. Use fewer when only one or two meaningful changes exist; never invent filler.
+- [x] One outcome per item, usually one sentence. Aim for roughly 15–30 words rather than a rigid truncation limit.
+- [x] Use everyday language, mentioning the affected feature/page/skill when useful.
+- [x] Group related internal edits by their outcome.
+- [x] Cover meaningful developer-facing improvements too; GentJin's users are developers.
+- [x] Exclude paths, symbols, loader mechanics, stack traces, internal investigation narratives, and detailed test inventories by default.
+- [x] Avoid large sections such as Root Cause, Implementation, Testing, Notes, or Documentation in the default commit/PR body.
+- [x] Include a short material limitation when needed to avoid misleading readers. Do not hide genuine unresolved risk for brevity.
+- [x] Detailed descriptions remain possible when the user explicitly requests them or mandatory repository policy requires them. Otherwise this concise format wins over a historical verbose commit style.
+- [x] Derive the summary from the final branch diff and relevant task/audit evidence, not the latest commit alone or stale memory.
+- [x] Never claim tests, installation, or live behavior passed without observed evidence.
+      Illustrative concise version of the user's supplied change narrative:
+      Do not reuse these items without confirming they match the actual branch.
+      Improves tracing, optional Git safeguards, and engineering workflows.
 
-- Inspect the actual repository and applicable instructions before editing.
-- The current code and documentation are authoritative. This file proposes GentJin names; it does not claim matching upstream skills exist under those names.
-- Verify upstream paths, content, and license before adapting anything. Record the inspected commit or version. If access fails, identify what could not be verified and implement only clearly specified local requirements.
-- Preserve existing architecture, commands, preferences, working tree changes, and user data.
-- Reuse existing skills and supporting scripts before adding equivalents. Do not create duplicate workflows.
-- Keep the global entry point small; detailed instructions belong in skills or references loaded when needed.
-- No new runtime dependencies or services by default. No mandatory MCP connection, paid tool, specific model, or issue tracker.
-- Database access stays read-only by default. Never modify production credentials or include secrets, patient data, or private customer information in notes or fixtures.
-- Reviews and planning remain read-only unless the user's task authorizes implementation.
-- Continue through all phases. Report a genuine blocker precisely and continue independent work.
-- Do not claim a scenario passed without running it or observing the required behavior.
-- Do not remove legitimate regression tests as cleanup. Remove only disposable fixtures, debugging files, and generated artifacts introduced for temporary investigation.
-- Do not implement parallel agents, worktree orchestration, or automatic self-modification in this task.
+1. Fixed tracing so OpenCode sessions can record activity.
+2. Added optional Git safeguards that block restricted commands after setup.
+3. Improved bug investigation so fixes start from observed evidence.
+4. Strengthened testing guidance to check meaningful behavior.
+5. Improved feature planning with clear requirements and implementation tasks.
+6. Improved knowledge capture for bugs, terms, and important decisions.
+7. Added guidance for creating and maintaining GentJin skills.
+   The exact test totals and technical loader explanation belong in the detailed record.
+8. Connect the format to the actual push workflow
 
-## Phase 1 — Inventory and integration plan
+- [x] In command/git-push.md, add an explicit step before committing: prepare the short subject and concise numbered body from the final logical change.
+- [x] Validate the prepared body before using it. Fix verbose output before it becomes a new commit.
+- [x] Use a safely written message file for multiline commit text when appropriate; preserve actual newlines and avoid shell interpolation.
+- [x] In skills/git-workflow/SKILL.md, apply the same contract to the "Commits" section and connect it to "Branch Description".
+- [x] Inspect the resulting commit with git show -s --format=%B before a requested push.
+- [x] Keep separate logical commits where appropriate; do not squash/rewrite history just to influence GitHub's prefilling.
+- [x] For an existing verbose commit, provide a concise PR body instead of silently amending it.
+- [x] Provide a clearly separated ready-to-paste PR title and body after preparing/pushing the branch.
+- [x] Keep branch name, commit reference, test results, cleanup details, and required Notes in the console report outside the copyable PR body.
+- [x] Push authorization alone must not cause automatic PR creation.
+      Manual PR behavior:
+- For one commit, a concise commit body supports GitHub's documented default.
+- For multiple commits, templates, or other prefill sources, do not guarantee GitHub will show the prepared body automatically.
+- Give the user the exact concise body to paste or replace the suggested text.
+- A Git push does not itself update a GitHub PR description.
+  Authorized automated PR behavior:
+- If the user separately authorizes PR creation/update, pass the prepared description explicitly.
+- With gh, use a safely written body file and --body-file.
+- Never substitute the detailed console/Vault report as the PR body.
 
-- [x] Confirm the GentJin source root, branch, working tree state, and applicable AGENTS.md instructions.
-- [x] Read the README, current skill/command catalog, project discovery rules, installation/update workflow, and relevant Knowledge Vault notes.
-- [x] Inspect existing equivalents of routing, issue triage, planning, TDD, domain modeling, skill creation, Git safeguards, and hook setup.
-- [x] Inspect relevant reference skills and their supporting files; verify actual current paths rather than trusting names from a prior conversation.
-- [x] Create a concise integration map in the repository's established documentation location:
+3. Check conflicting rules and templates
 
-| Proposed capability               | Existing GentJin owner                | Action         | Verified reference      |
-| --------------------------------- | ------------------------------------- | -------------- | ----------------------- |
-| Routing                           | Determine from source                 | Enhance or add | Exact path and revision |
-| Bug triage                        | Determine from source                 | Enhance or add | Exact path and revision |
-| Specification and task planning   | Determine from source                 | Enhance or add | Exact path and revision |
-| TDD                               | Determine from source                 | Enhance or add | Exact path and revision |
-| Active knowledge capture          | knowledge-vault or current equivalent | Enhance        | Exact path and revision |
-| Domain and architecture knowledge | Determine from source                 | Integrate      | Exact path and revision |
-| Git safeguards and hook setup     | git-workflow or current equivalent    | Enhance        | Exact path and revision |
-| Skill authoring                   | Determine from source                 | Enhance or add | Exact path and revision |
+- [x] Check AGENTS.md, reporting, README, command instructions, PR templates if present, and supported install/update tooling for conflicting formatting.
+- [x] Clarify that console Notes/Documentation requirements do not get copied into the commit or PR body.
+- [x] Preserve existing templates and mandatory project policy; avoid adding a generic template as the primary fix.
+- [x] Update tracked installation/catalog references only where needed.
+- [x] Document that merged source changes do not prove the running OpenCode installation has updated rules.
+- [x] Verify installed files only if the user's environment is accessible; otherwise provide exact update/restart steps without claiming they were executed.
+- [x] Do not overwrite live global configuration without authorization.
 
-- [x] Preserve required attribution and license notices for any reused material. Prefer original GentJin instructions adapted from concepts.
-- [x] Establish source versus runtime ownership. Do not recreate obsolete permanent installation directories or assume a previous installation layout still applies.
+4. Add targeted evaluation coverage
+   Reuse the existing evaluation framework. Inspect final output artifacts, not just whether instructions contain "numbered list".
 
-Acceptance: every proposed capability has one clear owner, and overlapping skills have a documented resolution.
+- [x] A verbose input narrative is converted to a concise summary and numbered outcomes.
+- [x] A fresh commit in an isolated temporary repository has the intended subject/body, confirmed with git show.
+- [x] The user's supplied style is a positive example; the long plugin/guardrail narrative is a negative example for the default body.
+- [x] A list with one numbered line followed by long technical paragraphs fails the format check.
+- [x] A one-change branch produces one honest item rather than padded entries.
+- [x] Multi-commit work produces a summary of the whole final branch.
+- [x] Existing verbose history remains unchanged and a copyable replacement PR body is provided.
+- [x] Console Notes/Documentation stay outside the prepared commit/PR body.
+- [x] A missing gh tool or missing PR authorization does not prevent producing the manual copy/paste body.
+- [x] Material limitations are retained concisely and unverified success claims are rejected.
+- [x] Safely handle multiline bodies and literal shell-sensitive characters.
+- [x] Run relevant existing checks and record outcomes.
+- [x] Distinguish synthetic formatting/contract evaluations from observed live model behavior and actual GitHub UI verification. Do not claim a deterministic check proves model compliance.
+      Do not push to a remote just to test formatting.
+      Acceptance criteria
+- Existing numbered-list instructions now cover commit bodies and explicit PR-body preparation.
+- A freshly created local commit body follows the concise format.
+- Manual PR users receive a ready-to-paste title and numbered description.
+- Detailed audit information remains available without becoming default PR text.
+- Existing history and remote PRs are not rewritten.
+- Evaluations catch verbose text even when it contains a token numbered list.
+- Any runtime or GitHub UI verification still pending is clearly identified.
+  Final report
+  Use a short numbered change list, then a concise verification statement and required Notes.
+  State:
 
-## Phase 2 — Routing and project context
-
-### Routing (suggested name: gentjin-router)
-
-- [x] Add or enhance a lightweight routing entry point.
-- [x] Recognize task intent, authorized scope, changed files, affected layers, and available tools.
-- [x] Select the smallest sufficient workflow. Do not run every reviewer for every task.
-- [x] Respect explicit skill requests and review-only instructions.
-- [x] Run skills in dependency order; avoid recursive routing and repeated context discovery.
-- [x] Escalate questions only when an unresolved choice materially changes scope or safety. Do not require a long questionnaire for routine fixes.
-- [x] If a needed tool is unavailable, report the limit and use an appropriate local fallback.
-
-Routing examples to document and validate:
-
-- "Review what I changed" → changes-review; include relevant specialist checks for affected code.
-- "Review the whole project" → project-review; report findings without applying fixes.
-- "This table has data but renders no rows" → issue-triage before proposing a fix.
-- "Plan this feature" → feature-planning; no implementation implied.
-- "Build this feature" → proportional planning, implementation, relevant review, verification, and capture.
-- "Prepare my changes for push" → Git inspection and checks; do not push from preparation alone.
-
-### Project context
-
-- [x] Extend the existing discovery mechanism and .project-agent.md convention if still current.
-- [x] Record only necessary stable context: project identity, Vault path, stack, validation commands, documentation locations, and optional issue tracker.
-- [x] Infer context from the repository first; ask only for information that cannot be safely inferred.
-- [x] Preserve existing fields and overrides. Do not introduce a competing project configuration.
-- [x] Work without an issue tracker or MCP server.
-- [x] Load only relevant context and notes rather than the entire Vault.
-
-Acceptance: natural-language requests select the appropriate scope and skills without duplicate execution or unrelated edits.
-
-## Phase 3 — Evidence-based issue triage
-
-Suggested name: issue-triage, unless a suitable owner exists.
-
-- [x] Capture expected behavior, actual behavior, reproduction steps, affected environment, and available evidence.
-- [x] Trace the relevant flow end to end. For UI failures, inspect response shape, mapping, state, filters, pagination, template conditions, and rendered output where applicable.
-- [x] Separate observations from hypotheses. Rank plausible causes and choose checks that can distinguish them.
-- [x] After a failed fix, record the attempt and change the investigation based on evidence. Do not repeatedly offer the same patch without new evidence.
-- [x] Treat a successful build as build evidence only; it does not prove the original bug is fixed.
-- [x] For an authorized fix, reproduce the failure when feasible, implement the smallest supported correction, and verify the original reproduction.
-- [x] If runtime access is unavailable, report "implemented; runtime verification pending" with exact remaining steps.
-- [x] Capture meaningful root causes and failed approaches in the established bugs/WIP locations.
-
-Acceptance: triage produces an evidence-backed diagnosis or a precise blocker, with no unsupported "fixed" claims.
-
-## Phase 4 — Specification and task planning
-
-Suggested name: feature-planning. Keep one skill with optional reference files unless splitting has a clear benefit.
-
-- [x] Scale planning to the work: a small fix needs a short plan; a larger feature may need a specification.
-- [x] Establish the problem, user flow, constraints, scope, non-goals, acceptance criteria, affected modules, and validation approach.
-- [x] Distinguish confirmed requirements from assumptions and unresolved questions.
-- [x] Inspect current behavior and existing interfaces before proposing an architecture.
-- [x] Include loading, error, empty, authorization, accessibility, and data-handling behavior when relevant.
-- [x] Break larger work into tasks with dependencies, expected outcomes, and concrete verification.
-- [x] Use existing local task/issue conventions. Draft external issues locally unless publication is explicitly authorized.
-- [x] Record meaningful product and architecture choices in the existing Vault locations.
-- [x] Planning-only requests must not alter application code.
-
-Acceptance: tasks are implementable and acceptance criteria can be checked without expanding scope.
-
-## Phase 5 — Proportional TDD and regression verification
-
-Suggested name: tdd, or integrate into the existing implementation workflow.
-
-- [x] Reuse the project's existing runner and test conventions.
-- [x] For behavior changes where testing is appropriate, write a meaningful failing test, confirm the intended failure, make it pass, then refactor without changing behavior.
-- [x] Prefer public behavior and useful boundaries over tests that mirror implementation details.
-- [x] Include edge cases appropriate to the change; do not create a large testing framework for trivial work.
-- [x] If no runner exists, use existing tools or propose the smallest suitable setup. Do not silently add dependencies.
-- [x] Distinguish regression tests, build checks, static checks, and manual runtime verification.
-- [x] Preserve permanent regression tests. Keep real customer data and credentials out of test fixtures.
-- [x] When automation is impractical, document exact manual verification and its limits.
-
-Acceptance: test claims include commands and observed outcomes, and bug fixes retain useful regression coverage.
-
-## Phase 6 — Active Knowledge Vault capture and domain modeling
-
-Enhance the existing knowledge-vault skill rather than replacing its structure.
-
-- [x] Add a brief capture decision after meaningful work and before the final report.
-- [x] Search for existing relevant notes before creating new ones.
-- [x] Use the current canonical structure. The mappings below are conceptual; adapt paths to the repository's actual convention.
-- [x] Make capture selective. Empty folders are acceptable when no useful knowledge exists; do not manufacture notes to fill them.
-
-| Evidence discovered                         | Destination  | Minimum useful content                       |
-| ------------------------------------------- | ------------ | -------------------------------------------- |
-| Confirmed failure and correction            | bugs         | Symptom, cause, correction, verification     |
-| Meaningful choice and rejected alternatives | decisions    | Context, choice, alternatives, consequence   |
-| Significant architecture choice             | ADRs         | Decision, rationale, tradeoffs, status       |
-| New or clarified business term              | glossary     | Meaning, relevant rules, code/doc links      |
-| Reusable implementation approach            | patterns     | Context, approach, applicability             |
-| Changed component responsibility            | modules      | Responsibility, interfaces, dependencies     |
-| Changed system relationship                 | architecture | Updated relationship and rationale           |
-| Important unfinished work                   | sessions/WIP | State, attempts, next step, blockers         |
-| Approved future improvement                 | enhancements | Problem, intended outcome, priority if known |
-
-- [x] Use one canonical note for a decision; link an ADR from the decision index instead of duplicating the same narrative.
-- [x] Update existing notes while preserving history and marking superseded assumptions.
-- [x] Link claims to relevant files, symbols, commits, or task references when available.
-- [x] Mark user-confirmed rules, code-derived behavior, and uncertain interpretations distinctly.
-- [x] Track meaningful changes and why they were made using the existing audit/session mechanism. Avoid recording every trivial edit in every folder.
-- [x] Prefer a glossary index that links existing notes over another competing CONTEXT.md/GLOSSARY.md system.
-- [x] Do not infer business policy from variable names alone.
-- [x] Final reporting states useful notes created/updated, or a concise reason no durable note was needed.
-
-Acceptance: a real decision, business term, or root cause triggers the appropriate capture; unsupported information is not presented as established knowledge.
-
-## Phase 7 — Git safeguards and optional pre-commit setup
-
-Enhance git-workflow/git-push and add setup-pre-commit only if missing and justified.
-
-- [x] Inspect branch, diff, staged changes, remote, and existing safeguards before acting.
-- [x] Never stage unrelated user changes or include credentials and generated debug artifacts.
-- [x] Do not reset, force-push, rewrite shared history, or bypass hooks without explicit authorization for that action.
-- [x] Keep "review," "prepare," "commit," and "push" permissions distinct.
-- [x] Preserve concise numbered change descriptions for branches/PRs; avoid long internal process narratives.
-- [x] Do not claim checks ran when they were unavailable or skipped.
-- [x] Make hook setup an explicitly invoked capability, not a surprise side effect of ordinary coding tasks.
-- [x] Inspect existing hooks and tooling; preserve them and reuse existing validation commands.
-- [x] Keep local hooks fast and leave expensive checks to existing CI where appropriate.
-- [x] Provide setup, verification, and rollback instructions. Explain that hooks alone do not enforce server-side merge protection.
-- [x] Do not install hook tooling into unrelated projects or change remote branch rules in this task.
-
-Acceptance: Git preparation reports exact scope and validation; existing hooks remain functional and external actions require the corresponding authorization.
-
-## Phase 8 — Controlled skill authoring
-
-Suggested name: skill-authoring; adapt to existing naming conventions.
-
-- [x] Define when a reusable skill is justified and when to extend an existing one.
-- [x] Include purpose, precise triggers, exclusions, inputs, workflow, permissions, outputs, fallbacks, and examples.
-- [x] Use GentJin/OpenCode's actual supported skill format and discovery mechanism.
-- [x] Keep core instructions concise and move optional detail into references.
-- [x] Detect overlapping triggers, contradictory safeguards, broken references, and recursive calls.
-- [x] Require representative scenario evaluation before registering a new skill.
-- [x] Changes to shared skills occur only in response to authorized skill work. Discovering a pattern during another task does not authorize rewriting global behavior.
-- [x] Record changes and rationale in the existing audit mechanism.
-- [x] Do not build an autonomous self-modifying agent.
-
-Acceptance: a newly authored skill is discoverable, narrowly triggered, compatible with existing rules, and supported by scenario evidence.
-
-## Phase 9 — Documentation, installation, and evaluation
-
-- [x] Update the README/catalog with final names, triggers, examples, and overlap boundaries.
-- [x] Keep entry points and command references consistent; add commands only where GentJin's conventions need them.
-- [x] Update tracked installation/update/manifest tooling so the new and enhanced skills are included.
-- [x] Preserve current exclusions for credentials, local configuration, dependencies, and unrelated files.
-- [x] Validate installation in an isolated temporary OpenCode config location. Do not overwrite the user's live installation.
-- [x] Use existing repository checks; add a small maintainable validation mechanism only if needed.
-- [x] Verify frontmatter, skill discovery, relative references, command links, and ownership of each workflow.
-- [x] Run scenario evaluations below. For each, record expected route, actual result, evidence, and pass/fail/blocked.
-- [x] Keep useful evaluation fixtures and results; remove disposable debug output.
-- [x] Review the final diff for unrelated changes and copied platform-specific assumptions.
-
-Required scenarios:
-
-1. Changed-code review selects relevant skills and makes no unauthorized fixes.
-2. Whole-project review remains read-only.
-3. Empty UI with a populated response prompts evidence gathering; build success is not reported as runtime success.
-4. A failed attempted fix changes the investigation rather than repeating the same suggestion.
-5. A business-term discovery updates or links the glossary.
-6. A meaningful architecture choice creates or updates a canonical decision/ADR.
-7. Routine formatting does not create unnecessary domain notes.
-8. Planning-only work produces a plan without changing application code.
-9. A behavior fix retains a meaningful regression test when feasible.
-10. Git preparation preserves unrelated changes and does not push.
-11. A project without an issue tracker/MCP still works locally.
-12. Existing hooks and project overrides survive setup/update.
-13. A new skill with overlapping triggers is revised or merged into an existing skill.
-14. Isolated installation discovers the final skills without obsolete runtime copies.
-
-## Completion requirements
-
-Mark a checkbox complete only when its behavior is implemented and its applicable verification is recorded. Use "blocked" or "deferred" with a concrete explanation for unmet items.
-
-Finish with the established GentJin report format:
-
-### Summary
-
-What changed and what is usable.
-
-### Details
-
-1. Concise numbered changes.
-2. Final skills added/enhanced and files changed.
-3. Upstream references inspected and their revision; attribution if applicable.
-4. Verification commands/scenarios and observed outcomes.
-5. Durable notes captured.
-6. Blockers, deferred items, and verification still pending.
-
-### Suggestion
-
-Only practical next steps, including how to update the user's runtime if needed.
-
-Do not describe prompt routing alone as an evaluated autonomous engineering system. Report the behavior and evaluation evidence actually delivered.
+1. Which rules/files were changed.
+2. Whether commit-body and PR-body outputs were actually inspected.
+3. Which checks ran and their observed results.
+4. Whether the live OpenCode installation was verified or still needs updating.
+   Provide one example of the final concise description. Do not recreate the long technical narrative in the user-facing report.
