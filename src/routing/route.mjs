@@ -95,7 +95,7 @@ const ROUTES = [
   { terms: ["sql", "database query", "schema migration", "why is this query slow"], expect: "database-review" },
   { terms: ["sql injection", "leaked secret", "auth bypass", "exposed token"], expect: "security-review" },
   { terms: ["are we ready to deploy", "rollback plan", "production release"], expect: "deployment-readiness" },
-  { terms: ["review my recent diff", "review these changes"], expect: "changes-review" },
+  { terms: ["review my recent diff", "review these changes", "review what i changed", "review my changes", "review the diff"], expect: "changes-review" },
   { terms: ["what did we decide about auth", "remember this workflow", "open question"], expect: "knowledge-vault" },
   { terms: ["the table is empty but the API returned data", "regression", "this broke"], expect: "systematic-debugging" },
   { terms: ["accessible on mobile", "responsive layout", "focus state"], expect: "frontend-review" },

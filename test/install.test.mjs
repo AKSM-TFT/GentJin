@@ -51,7 +51,9 @@ test("a clean install copies the full runtime payload into a temporary location"
     }
     assert.ok(existsSync(join(target, "AGENTS.md")))
     assert.ok(existsSync(join(target, "skills", "knowledge-vault", "SKILL.md")))
-    assert.ok(existsSync(join(target, "plugins", "gentjin-trace.mjs")))
+    assert.ok(existsSync(join(target, "plugins", "gentjin-trace.js")))
+    assert.ok(existsSync(join(target, "src", "trace", "plugin-body.mjs")))
+    assert.ok(existsSync(join(target, "src", "trace", "plugin-support.mjs")))
     assert.ok(existsSync(join(target, "registry", "skills.json")))
   })
 })

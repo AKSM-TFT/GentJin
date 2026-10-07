@@ -104,7 +104,7 @@ export function inferTriggers(name, description) {
     "test-strategy": ["test coverage", "what to test", "regression test", "test level"],
     "systematic-debugging": ["bug", "broken", "regression", "not working", "why is this happening", "fails"],
     "requirements-review": ["ambiguous", "unclear requirement", "acceptance criteria", "conflicting"],
-    "architecture-review": ["architecture", "subsystem", "boundary", "migration path", "redesign", "scaffold"],
+    "architecture-review": ["architecture", "subsystem", "migration path", "redesign", "scaffold", "module ownership"],
     "refactoring-migration": ["refactor", "migrate", "expand-contract", "dual-write", "backfill", "deprecate"],
     "project-conventions": ["existing codebase", "match conventions", "reuse existing", "codebase learning"],
     "knowledge-vault": ["remember", "knowledge", "vault", "note", "what did we decide", "prior session"],
@@ -115,6 +115,7 @@ export function inferTriggers(name, description) {
     "cleanup": ["clean up", "before merge", "production ready", "dead code", "leftover debug"],
     "incident-handling": [],
     "review-orchestrator": ["full review", "whole codebase", "comprehensive review", "changes review"],
+"skill-authoring": ["new skill", "write a skill", "edit a skill", "author a skill", "skill triggers", "merge two skills"],
     "dependency-review": ["add a package", "upgrade dependency", "replace library", "audit finding", "npm audit"],
   }
   triggers.push(...(table[name] ?? []))

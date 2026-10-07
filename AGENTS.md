@@ -84,6 +84,36 @@ Preserve the mandatory pause behavior: when the user indicates pause, hold, stop
 
 On resume, locate the relevant WIP, read the smallest relevant durable knowledge, inspect current source, reconcile stored knowledge with current reality, reassess applicable skills and delegation, and continue from the recorded next action when it is still valid. Rebuild working context from WIP plus relevant vault entries plus current source per `compaction`; treat any prior compacted summary as low-authority working memory, never as truth.
 
+## Routing
+
+Choose the smallest workflow that finishes the request. Running every reviewer on every task is slower, noisier, and dilutes attention.
+
+Recognize four inputs before selecting anything:
+
+- **Intent** — diagnose, plan, review, implement, or explain.
+- **Authorized scope** — what the user permitted, including read-only limits.
+- **Changed files and affected layers** — what the diff touches.
+- **Available tools** — and what to do when one is missing.
+
+Two entry points merge onto the same main flow:
+
+| Situation | Route to |
+| --- | --- |
+| Something arrived raw: a bug report, a request, an external PR | `systematic-debugging` for the cause |
+| Something is planned but not started | `requirements-review` before any code |
+| Work is under way and must survive a pause | `work-in-progress` |
+| Prior context is unclear or unknown | `knowledge-vault` |
+
+The main flow is intent → plan → implement → verify → capture. Most requests enter partway through.
+
+Run skills in dependency order: understanding before structure, structure before editing, editing before verification, verification before capture. Never route recursively, and never re-discover context a skill already established.
+
+When several skills genuinely apply, load the one that owns the primary concern first and let it name the others. A general defect goes to `systematic-debugging`, never to a review skill.
+
+Escalate a question only when an unresolved answer changes scope, safety, or cost. Routine fixes proceed on a stated interpretation.
+
+If a needed tool is unavailable, name the limit and use the closest local fallback rather than silently narrowing the task.
+
 ## Orchestration Checkpoints
 
 Pre-task, during-task, and completion or pause checkpoints follow the sections above: inspect knowledge and select skills before starting, reassess and capture at milestones, then flush knowledge, update WIP, and verify before reporting success. This work cycle is a behavioral model, not a requirement to print internal reasoning.
@@ -270,6 +300,7 @@ Verify:
 Finish and preserve:
 - `cleanup` - pre-main QA, debugging, testing, code quality, tooling verification, and production-readiness review.
 - `git-workflow` - Git status/diff/history review, branch/commit conventions, and guarded source-control actions.
+- `skill-authoring` - creating, extending, merging, or auditing a skill and its triggers.
 - `knowledge-vault` - project discovery, vault structure, note retrieval, note capture, migration, ADRs, questions, enhancements, and sessions.
 - `work-in-progress` - pause, resume, active WIP tracking, completion, and next-action preservation.
 - `compaction` - short-term context condensing, WIP/vault triage, and lean resume rebuilding.
