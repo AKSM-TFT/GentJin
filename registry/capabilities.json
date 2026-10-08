@@ -247,6 +247,29 @@
       "waivable_steps": []
     },
     {
+      "id": "release-notes",
+      "kind": "command",
+      "path": "command/release-notes.md",
+      "description": "Prepare paste-ready release notes for the changes accumulated since the previous release, save them in the Knowledge Vault, and never publish anything.",
+      "intent": [],
+      "aliases": [
+        "/release-notes"
+      ],
+      "prerequisites": [],
+      "scope": "assisted_workflow",
+      "grants_code_change_authority": false,
+      "review_only": false,
+      "guarded": false,
+      "guarded_reason": null,
+      "required_preconditions": [],
+      "allowed_actions": [
+        "read",
+        "reporting"
+      ],
+      "exclusions": [],
+      "waivable_steps": []
+    },
+    {
       "id": "report",
       "kind": "command",
       "path": "command/report.md",

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto"
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs"
 import { join } from "node:path"
+import { preflightPayload } from "./apply.mjs"
 
 const PRESERVED_DIRECTORIES = ["command", "skills"]
 
@@ -36,6 +37,21 @@ export function listUnclaimed(root, manifest) {
  * installed bytes still match the hash the manifest recorded; anything else is a conflict.
  */
 export function planReconcile({ root, payloadRoot, manifest }) {
+  const preflight = preflightPayload(payloadRoot)
+  if (!preflight.ok) {
+    return {
+      refused: true,
+      reason: preflight.reason,
+      safe: [],
+      conflicts: [],
+      unchanged: [],
+      stale: [],
+      unclaimed: [],
+      preserved: [],
+      writes_metadata_last: true,
+    }
+  }
+
   const safe = []
   const conflicts = []
   const unchanged = []

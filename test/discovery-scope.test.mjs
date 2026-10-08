@@ -3,6 +3,7 @@ import assert from "node:assert/strict"
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { createRequire } from "node:module"
 import {
   createDiscoveryState,
   beginSession,
@@ -14,6 +15,8 @@ import {
   readinessFor,
 } from "../src/discovery/gate.mjs"
 import { resolveProject } from "../src/discovery/resolve.mjs"
+
+const require = createRequire(import.meta.url)
 import { READINESS } from "../src/discovery/readiness.mjs"
 
 function project(name) {
@@ -138,4 +141,21 @@ test("scope ordering does not weaken the check once discovery has started", () =
   } finally {
     rmSync(base, { recursive: true, force: true })
   }
+})
+
+test("regression: the plugin resolve handler starts discovery instead of returning a null record", () => {
+  const { readFileSync } = require("node:fs")
+  const { join: joinPath } = require("node:path")
+  const source = readFileSync(joinPath(process.cwd(), "plugins", "gentjin-capabilities.ts"), "utf8")
+
+  assert.match(
+    source,
+    /action === "resolve"[\s\S]{0,120}startDiscovery\(discovery, sessionId\)/,
+    "the resolve action must return the started discovery record",
+  )
+  assert.equal(
+    /action === "resolve"[\s\S]{0,120}JSON\.stringify\(record,/.test(source),
+    false,
+    "the resolve action must not return a record captured before discovery started",
+  )
 })

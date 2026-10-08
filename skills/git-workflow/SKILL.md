@@ -34,6 +34,10 @@ Do not derive a title from a branch that does not match, or from a protected bra
 
 The `/git-push` command implements this workflow end to end.
 
+## Release Notes After a Push
+
+After a successful user-requested push, offer paste-ready release notes for the changes accumulated since the previous release, and run `/release-notes` when the user accepts. The offer is one short question. Skip it when there are no eligible changes, and skip asking again when the user declines for that push. Preparing notes never creates a release, a tag, or a pull request, and never changes the completed push.
+
 ## Change Description
 One contract governs three outputs: the body of a commit, a proposed or authorized PR description, and the ready-to-paste text for a PR the user will open by hand. Do not invent a separate style for any of them.
 

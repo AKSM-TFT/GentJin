@@ -412,6 +412,9 @@ src/capabilities/resolve.mjs
 src/capabilities/loader.mjs
 src/capabilities/loader.d.mts
 src/capabilities/adherence.mjs
+src/release/collect.mjs
+src/release/render.mjs
+src/release/vault.mjs
 src/discovery/resolve.mjs
 src/discovery/readiness.mjs
 src/discovery/gate.mjs

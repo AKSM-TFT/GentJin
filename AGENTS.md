@@ -203,7 +203,7 @@ When the user asks to push to GitHub (or any remote):
 - Show the user the exact branch name you plan to create and ask for explicit approval before creating it, committing on it, or pushing. If the user rejects the proposed name, let them type their own branch name.
 - After approval, create the branch, make a focused commit, and push with upstream tracking (`git push -u origin <branch>`).
 - The commit body, a PR description, and ready-to-paste manual PR text all follow the Change Description contract in `git-workflow`: a short summary followed by a concise numbered list of meaningful outcomes. No investigation history, file paths, or test inventories by default.
-- A push does not create or update a pull request. Push authorization is not PR authorization. After pushing, print a ready-to-paste PR title and body in their own block, separate from the console report.
+- A push does not create or update a pull request. Push authorization is not PR authorization. After a successful push, offer paste-ready release notes for the changes since the previous release, and run `/release-notes` when accepted. Notes are prepared and saved locally; publishing stays entirely manual. After pushing, print a ready-to-paste PR title and body in their own block, separate from the console report.
 - Merging source changes does not prove the user's installed runtime has the new rules. Verify the installed copy, or give exact update and restart steps without claiming they were executed.
 
 ## OpenCode Configuration
