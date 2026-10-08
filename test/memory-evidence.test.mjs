@@ -25,7 +25,7 @@ function project(name) {
 
 function ready(name, sessionId = "s1") {
   const { base, root } = project(name)
-  const resolution = resolveProject(root)
+  const resolution = { ...resolveProject(root), knowledge_root: join(base, "vault") }
   const state = createDiscoveryState()
   beginSession(state, sessionId, resolution)
   startDiscovery(state, sessionId)

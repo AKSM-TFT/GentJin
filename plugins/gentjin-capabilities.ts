@@ -30,13 +30,33 @@ import {
   readinessFor,
   recordFor,
   recordMemory,
+  startDiscovery,
   type DiscoveryState,
 } from "../src/discovery/gate.mjs"
 import { resolveProject } from "../src/discovery/resolve.mjs"
+import {
+  collectChanges,
+  defaultBranch,
+  hasEligibleChanges,
+  resolveBoundary,
+  resolveTarget,
+  suggestVersion,
+} from "../src/release/collect.mjs"
+import { renderReleasePackage } from "../src/release/render.mjs"
+import { saveReleaseNote } from "../src/release/vault.mjs"
 import { createGateTracer } from "../src/discovery/gate-trace.mjs"
 import type { GateTracer } from "../src/discovery/gate-trace.mjs"
 
 interface PluginInput {
+  project?: string
+  theme?: string
+  intro?: string[]
+  items?: { title?: string; detail?: string }[]
+  why?: string
+  projectContext?: string
+  limitations?: string[]
+  breaking?: string[]
+  repository?: string
   id?: string
   kind?: string
   action?: string
@@ -110,6 +130,87 @@ export default async (ctx: { directory?: string; sessionID?: string }) => {
         },
       },
 
+      gentjin_release_notes: {
+        description:
+          "Prepare release notes for the current repository from verified Git history. " +
+          "Action 'collect' returns the target, previous boundary, collected changes and a proposed " +
+          "version so you can write accurate prose. Action 'render' takes your theme, intro, items " +
+          "and notes, renders the Markdown and saves it into this project's knowledge root. " +
+          "This never creates a tag, a release or a pull request, and never publishes anything.",
+        args: {
+          action: { type: "string", description: "collect | render" },
+          theme: { type: "string", description: "Short release theme, for action render" },
+          intro: { type: "array", description: "One or two short paragraphs, for action render" },
+          items: {
+            type: "array",
+            description: "Change items as { title, detail }, for action render",
+          },
+          why: { type: "string", description: "Why this release matters, for action render" },
+          projectContext: { type: "string", description: "Verified project context, for action render" },
+          limitations: { type: "array", description: "Short limitation statements, for action render" },
+          breaking: { type: "array", description: "Breaking change statements, for action render" },
+          repository: { type: "string", description: "Repository URL, for action render" },
+        },
+        async execute(args: PluginInput): Promise<string> {
+          const action = args?.action ?? "collect"
+          const root = resolution.project_root
+          const target = resolveTarget(root, "HEAD")
+          const boundary = resolveBoundary(root, target)
+          const items = boundary.sha ? collectChanges(root, boundary.sha, target.sha) : []
+
+          if (action === "collect") {
+            return JSON.stringify({
+              project_root: root,
+              knowledge_root: resolution.knowledge_root,
+              branch: defaultBranch(root) ?? target.branch,
+              target_sha: target.sha,
+              previous_boundary: boundary.tag,
+              previous_boundary_selected: Boolean(boundary.selected),
+              previous_boundary_verified: Boolean(boundary.verified),
+              previous_release_published: Boolean(boundary.publication?.verified),
+              boundary_warning: boundary.warning,
+              eligible_changes: hasEligibleChanges(items) ? items.length : 0,
+              items,
+              proposed_version: suggestVersion(root, items),
+            }, null, 2)
+          }
+
+          const pkg = renderReleasePackage({
+            project: args?.project ?? resolution.identity,
+            theme: args?.theme,
+            repository: args?.repository,
+            projectContext: args?.projectContext,
+            intro: args?.intro ?? [],
+            items: args?.items ?? [],
+            why: args?.why,
+            limitations: args?.limitations ?? [],
+            breaking: args?.breaking ?? [],
+            target,
+            boundary,
+            version: suggestVersion(root, items),
+            evidence: items.map((i) => ({ kind: "commit", reference: i.key, subject: i.subject })),
+          })
+
+          const saved = saveReleaseNote({ knowledgeRoot: resolution.knowledge_root, pkg })
+
+          return JSON.stringify({
+            saved: saved.ok,
+            path: saved.path ?? null,
+            save_error: saved.ok ? null : saved.error,
+            updated_in_place: Boolean(saved.updated),
+            proposed_title: pkg.title,
+            release_url: pkg.releaseUrl,
+            previous_boundary: pkg.previousBoundary,
+            previous_release_published: pkg.previousReleasePublished,
+            boundary_advanced: pkg.boundaryAdvanced,
+            created_tag: pkg.createsTag,
+            created_release: pkg.createsRelease,
+            published: pkg.published,
+            body: pkg.body,
+          }, null, 2)
+        },
+      },
+
       gentjin_discovery: {
         description:
           "Record and inspect verified project discovery for this session. Actions: " +
@@ -131,7 +232,7 @@ export default async (ctx: { directory?: string; sessionID?: string }) => {
           const record = recordFor(discovery, sessionId)
 
           if (action === "resolve") {
-            return JSON.stringify(record, null, 2)
+            return JSON.stringify(startDiscovery(discovery, sessionId), null, 2)
           }
 
           if (action === "scope") {

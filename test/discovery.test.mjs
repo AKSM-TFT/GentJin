@@ -91,13 +91,14 @@ test("isWithin does not treat a sibling with a shared prefix as inside", () => {
 function readySession(sessionId = "s1", options = {}) {
   const { base, root } = fixture({ git: true })
   const state = createDiscoveryState()
-  beginSession(state, sessionId, resolveProject(root))
+  const resolution = { ...resolveProject(root), knowledge_root: join(base, "vault") }
+  beginSession(state, sessionId, resolution)
   startDiscovery(state, sessionId)
   const target = join(root, "src", "app.js")
   if (options.read !== false) noteRead(state, sessionId, target)
   if (options.scope !== false) declareScope(state, sessionId, [target])
   if (options.memory !== false) {
-    const searchTarget = join(resolveProject(root).knowledge_root, "memory-index.md")
+    const searchTarget = join(resolution.knowledge_root, "memory-index.md")
     noteRead(state, sessionId, searchTarget)
     recordMemory(state, sessionId, {
       status: "ok",

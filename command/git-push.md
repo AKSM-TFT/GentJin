@@ -22,6 +22,15 @@ Run the guarded push workflow for the current repository's pending changes, foll
 
 9. Report, in this order and clearly separated: the branch name, the derived Jira backlog title, the commit reference, the cleanup result, the verification result, a pull-request link when the remote provides one, and the required `Notes`. After that, print the ready-to-paste PR title and concise numbered body in its own block, outside the report.
 
+10. After the report, decide the release-notes offer with `decideOffer` in `src/release/offer.mjs` so the skip conditions are verifiable rather than improvised, then act on it: offer exactly one short question, run the workflow, or offer nothing.
+
+    - Offer nothing when the push did not succeed.
+    - Offer nothing when there are no eligible changes, so no empty release is proposed.
+    - Honour an already explicit request without asking again.
+    - Do not ask again after a decline for the same push. A later successful push may offer again.
+
+    The offer text is exactly: “Would you like paste-ready release notes for the changes since the previous release?” Preparing notes never changes the completed push, creates a pull request, or modifies remote releases or tags; run `/release-notes` for the full workflow.
+
 Push authorization is not PR authorization. Creating or updating a pull request requires separate authorization; see Manual Pull Request Behavior below.
 
 ## Pre-Push Cleanup Gate

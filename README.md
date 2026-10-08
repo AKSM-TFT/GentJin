@@ -448,6 +448,7 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── gentjin-capabilities.ts  Capability loader + guarded-action block
 ├── src/capabilities/         Registry, resolution, loader, adherence state
 ├── src/discovery/            Project resolution and discovery readiness gate
+├── src/release/              Release-notes collection, rendering, vault save
 ├── registry/capabilities.json  Unified skill + command catalog
 ├── scripts/build-registry.mjs
 ├── scripts/build-capabilities.mjs
