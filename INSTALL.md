@@ -28,7 +28,7 @@ Installation direction:
 <source-root>/command/**   -> <opencode-root>/command/**
 <source-root>/skills/**    -> <opencode-root>/skills/**
 <source-root>/schemas/**   -> <opencode-root>/schemas/**
-<source-root>/src/**       -> <opencode-root>/src/**
+<source-root>/src/**       -> <opencode-root>/src/**  (includes src/discovery/)
 <source-root>/plugins/** -> <opencode-root>/plugins/**
 <source-root>/package.json -> <opencode-root>/package.json
 <source-root>/registry/**  -> <opencode-root>/registry/**
@@ -412,6 +412,10 @@ src/capabilities/resolve.mjs
 src/capabilities/loader.mjs
 src/capabilities/loader.d.mts
 src/capabilities/adherence.mjs
+src/discovery/resolve.mjs
+src/discovery/readiness.mjs
+src/discovery/gate.mjs
+src/discovery/gate.d.mts
 registry/skills.json
 registry/capabilities.json
 plugins/gentjin-trace.js

@@ -447,6 +447,7 @@ GENTJIN is designed to make the cautious path the easy path:
 ├── plugins/gentjin-trace.js  Trace plugin using real OpenCode hooks
 │   ├── gentjin-capabilities.ts  Capability loader + guarded-action block
 ├── src/capabilities/         Registry, resolution, loader, adherence state
+├── src/discovery/            Project resolution and discovery readiness gate
 ├── registry/capabilities.json  Unified skill + command catalog
 ├── scripts/build-registry.mjs
 ├── scripts/build-capabilities.mjs

@@ -28,6 +28,31 @@ description: Manage persistent project knowledge in the user's Knowledge Vault, 
 
 5. Keep global GENTJIN configuration project-agnostic.
 
+This precedence is implemented in `src/discovery/resolve.mjs` and enforced, not merely described.
+Call `gentjin_discovery` with action `resolve` rather than resolving by hand, so the record and the
+enforced behavior cannot drift apart. When the implementation and this section disagree, the
+implementation is the authority.
+
+### Discovery Readiness Before Retrieval
+
+Reading memory is not enough on its own; readiness also requires that the source the task will
+change has been inspected in this session. Before any project edit:
+
+1. Call `gentjin_discovery` with action `resolve`.
+2. Read the source the change affects. Reads are recorded per session by the runtime.
+3. Call `gentjin_discovery` with action `scope` and the intended paths.
+4. Call `gentjin_discovery` with action `memory` recording the notes read, or `no_relevant_notes`.
+5. Confirm with action `status` that readiness is `ready`.
+
+A claimed note is only accepted when it exists inside the resolved knowledge root and was actually
+read this session. Claiming that no note applies is accepted only when the knowledge root holds no
+`memory-index.md`. Set `failed` only when retrieval genuinely failed, which reports degraded
+operation rather than blocking.
+
+Readiness is invalidated when an inspected file changes or is deleted, or when the checked-out
+revision moves. After invalidation, re-read the affected source and declare scope again. Reads are
+never refused, so recovery is always possible.
+
 ## Workflow Memory
 
 Use workflow memory for recurring commands, personal automation patterns, and repeatable computer tasks that are likely to be requested again. Keep cross-project workflows in the global GENTJIN workflow store and project-specific workflows in the current project vault.

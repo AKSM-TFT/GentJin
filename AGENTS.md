@@ -217,6 +217,23 @@ When the user asks to push to GitHub (or any remote):
 - Resolve the project from the nearest Git root, then project metadata, then the working directory.
 - Resolve project identity from `.project-agent.md`, project metadata, Git metadata, or the root directory name, in that order.
 - Use `.project-agent.md` only for project-specific overrides such as project name, knowledge root, module domains, and verification commands.
+- The precedence above is implemented in `src/discovery/resolve.mjs` and is enforced, not merely described. Treat the implementation as the authority when the two disagree.
+
+### Discovery Readiness
+
+Before modifying a project, establish verified context for the intended change. Four states remain separate: project resolved, source inspected, memory retrieval recorded, readiness satisfied.
+
+1. Call `gentjin_discovery` with action `resolve` to identify the project root, identity, and knowledge root.
+2. Read the source the change affects. Reads are recorded per session; an unread file cannot be edited.
+3. Call `gentjin_discovery` with action `scope` and the intended paths. Relative paths resolve against the project root.
+4. Call `gentjin_discovery` with action `memory` recording either the notes read, or that none applied. No relevant notes is a valid result. Set `failed` only when retrieval genuinely failed.
+5. Call `gentjin_discovery` with action `status` to confirm readiness is `ready`.
+
+Project edits through `write`, `edit`, `patch`, and `multiedit` are refused until readiness is `ready`. Read, search, list, and Git-status operations are never refused, so the steps needed to recover are always available. Writes inside the resolved knowledge root stay permitted so memory can be captured.
+
+Readiness describes sufficient inspected context for this task. It never asserts understanding of the whole project, and it never authorizes a push or proves a fix works. The measured enforcement boundary, including known bypasses, is in `docs/discovery-enforcement.md`.
+
+When a hook is unavailable, apply these steps as instructions and say that runtime enforcement is unavailable. Never describe fallback mode as enforced.
 
 ## Knowledge
 
