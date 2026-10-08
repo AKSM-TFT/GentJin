@@ -176,8 +176,117 @@ const MUTATION =
 const SCRIPT_INTERPRETER =
   /(^|[;&|]\s*)(node|bun|deno|python3?|py|ruby|perl|pwsh|powershell|bash|sh|zsh)\b(?!\s--(?:version|help))/
 
+/**
+ * Reduces a shell command to the parts that are actually executed. Heredoc bodies, quoted string
+ * contents, and trailing comments are data, not commands, so a guarded phrase appearing inside a
+ * test name or a written file must not be treated as an operation.
+ */
+export function executableSegments(command) {
+  const text = String(command ?? "")
+  const segments = []
+  let current = ""
+  let i = 0
+
+  while (i < text.length) {
+    const ch = text[i]
+
+    if (ch === "\\") {
+      current += ch + (text[i + 1] ?? "")
+      i += 2
+      continue
+    }
+
+    if (ch === "'") {
+      const end = text.indexOf("'", i + 1)
+      const stop = end === -1 ? text.length : end
+      current += "'" + text.slice(i + 1, stop).replace(/'/g, "") + "'"
+      i = stop + 1
+      continue
+    }
+
+    if (ch === '"') {
+      let j = i + 1
+      let literal = ""
+      while (j < text.length && text[j] !== '"') {
+        if (text[j] === "\\") {
+          literal += text[j + 1] ?? ""
+          j += 2
+          continue
+        }
+        literal += text[j]
+        j += 1
+      }
+      current += '"' + literal + '"'
+      i = j + 1
+      continue
+    }
+
+    if (text.startsWith("<<", i) && !text.startsWith("<<<", i)) {
+      const marker = /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/.exec(text.slice(i))
+      if (marker) {
+        const delimiter = marker[2]
+        const bodyStart = text.indexOf("\n", i) + 1
+        const pattern = new RegExp(`^\\s*${delimiter}\\s*$`, "m")
+        const rest = pattern.exec(text.slice(bodyStart))
+        const bodyEnd = rest ? bodyStart + rest.index : text.length
+        current += " "
+        i = bodyEnd + (rest ? rest[0].length : 0)
+        continue
+      }
+    }
+
+    if (ch === "#" && (i === 0 || /[\s;&|]/.test(text[i - 1]))) {
+      const end = text.indexOf("\n", i)
+      i = end === -1 ? text.length : end
+      continue
+    }
+
+    if (ch === ";" || ch === "\n") {
+      segments.push(current)
+      current = ""
+      i += 1
+      continue
+    }
+
+    current += ch
+    i += 1
+  }
+
+  segments.push(current)
+  return segments.map((s) => s.trim()).filter(Boolean)
+}
+
+function stripQuotedContent(segment) {
+  let out = ""
+  let i = 0
+  while (i < segment.length) {
+    const ch = segment[i]
+    if (ch === "'") {
+      const end = segment.indexOf("'", i + 1)
+      i = end === -1 ? segment.length : end + 1
+      out += " "
+      continue
+    }
+    if (ch === '"') {
+      let j = i + 1
+      while (j < segment.length && segment[j] !== '"') {
+        if (segment[j] === "\\") j += 1
+        j += 1
+      }
+      i = j + 1
+      out += " "
+      continue
+    }
+    out += ch
+    i += 1
+  }
+  return out
+}
+
 export function isGuardedAction(command, registry) {
-  const text = String(command ?? "").toLowerCase()
+  const segments = executableSegments(command)
+  const loweredSegments = segments.map((s) => s.toLowerCase())
+  const phraseSegments = segments.map((s) => stripQuotedContent(s).toLowerCase())
 
   const targetsByCapability = {
     "update-gentjin": [".config/opencode", ".gentjin"],
@@ -187,15 +296,18 @@ export function isGuardedAction(command, registry) {
 
   const owners = []
   for (const capability of registry.capabilities.filter((c) => c.guarded)) {
-    const matched = (targetsByCapability[capability.id] ?? []).find((t) => text.includes(t.toLowerCase()))
+    const targets = targetsByCapability[capability.id] ?? []
+    const haystacks = capability.id === "git-push" ? phraseSegments : loweredSegments
+    const matched = targets.find((t) => haystacks.some((segment) => segment.includes(t.toLowerCase())))
     if (matched) owners.push({ capability, matched })
   }
 
   if (owners.length === 0) return { guarded: false }
 
+  const code = loweredSegments.join("\n")
   const gitMutation = owners.some((o) => o.capability.id === "git-push")
-  const runsScript = SCRIPT_INTERPRETER.test(text)
-  const mutates = MUTATION.test(text) || runsScript
+  const runsScript = SCRIPT_INTERPRETER.test(code)
+  const mutates = MUTATION.test(code) || runsScript
 
   if (!gitMutation && !mutates) {
     return { guarded: false, reason: "read-only inspection of a guarded path is permitted" }
