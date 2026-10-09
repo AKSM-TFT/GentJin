@@ -1,0 +1,21 @@
+{
+  "name": "gentjin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A disciplined orchestration layer for AI coding agents: skills, commands, evidence, and runtime enforcement.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "registry": "node scripts/build-registry.mjs && node scripts/build-capabilities.mjs",
+    "eval": "node evals/run.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

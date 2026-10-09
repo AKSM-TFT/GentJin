@@ -1,6 +1,6 @@
 ---
 name: work-in-progress
-description: Preserve and resume unfinished development work. MUST be used when the user pauses, holds, stops for now, or asks to continue previous work, and at meaningful milestones during substantial unfinished work, even without an explicit request. Use when work spans sessions, is blocked, or meaningful implementation remains. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.
+description: Preserve and resume unfinished development work. MUST be used when the user pauses, holds, stops for now, or asks to continue previous work, and at meaningful milestones during substantial unfinished work, even without an explicit request. Use when work spans sessions, is blocked, or meaningful implementation remains. This is a core GENTJIN system, not an optional extra: keep the active state current rather than reconstructing it later. Maintains WIP state, decisions, rejected approaches, blockers, testing status, files, and one clear next action.
 ---
 # Work in Progress
 
@@ -22,8 +22,27 @@ Include when applicable:
 - Testing / Verification
 - Next Action
 - Related Knowledge
+- Change Audit (link to `changes/<note>.md` once written)
+- Temporary Artifact Ledger (see below)
 
 Preserve conclusions and reasoning, not chat transcripts. Update on meaningful progress, not every small edit.
+
+## Temporary Artifact Ledger
+
+Track temporary development artifacts at the moment they are created, not by guessing at push time. Maintain this table in the active WIP note, and reflect it in the durable change audit.
+
+```markdown
+## Temporary Artifact Ledger
+
+| File | Type | Purpose | Remove Before Push | Cleanup Status |
+|---|---|---|---|---|
+| scripts/debug-api.ts | DEBUG | Inspect API response | Yes | Removed / Retained / Pending |
+| db/seed-qa.ts | SEED | Create local QA records | Yes | Removed / Retained / Pending |
+```
+
+Types: TEST, QA, DEBUG, SEED, MOCK, FIXTURE, TEMP, LOCAL-ONLY.
+
+This ledger follows the task until completion or push. When a temporary artifact is removed, update its Cleanup Status to `Removed`. When the change audit is written, mirror the Removal status into its Temporary Development Artifacts section.
 
 ## Current Resume State
 
@@ -42,6 +61,8 @@ Maintain `work-in-progress/current.md` as the single canonical answer to "what w
 Topic WIP notes may continue alongside it when several workstreams run in parallel; `current.md` links to them. When the work is finished, clear or archive the active state rather than leaving a misleading resume point.
 
 `current.md` and the daily session note together must contain enough state to resume after an interruption or a compaction without the previous conversation.
+
+Cooperation: WIP owns unfinished state and the next action. When context grows large, `compaction` condenses the thread and hands unfinished work here and durable findings to `knowledge-vault`; it never replaces this note. On resume, rebuild from this note plus relevant vault notes plus current source rather than trusting an old compacted summary.
 
 ## Pause
 When the user says pause, save where we are, continue later/tomorrow/next time, or equivalent:

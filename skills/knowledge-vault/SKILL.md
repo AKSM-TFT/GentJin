@@ -1,6 +1,6 @@
 ---
 name: knowledge-vault
-description: Manage persistent project knowledge in the user's Knowledge Vault, including project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration. MUST be used when durable knowledge is established during a task, even when the user never asks for notes, and when the user says "remember this", "save this workflow", or "don't do that again". Never store transcripts, secrets, or cheap-to-rediscover information.
+description: Manage persistent project knowledge in the user's Knowledge Vault, including project/vault discovery, note-first lookup, vault initialization and normalization, automatic knowledge capture, architecture and ADRs, patterns, bugs, enhancements, investigations, work-in-progress, sessions, reports, and migration. MUST be used when durable knowledge is established during a task, even when the user never asks for notes, and when the user says "remember this", "save this workflow", or "don't do that again". This is a core GENTJIN system, not an optional extra: prefer capturing a useful note over skipping one. Never store transcripts, secrets, or cheap-to-rediscover information.
 ---
 
 # Knowledge Vault
@@ -40,6 +40,31 @@ description: Manage persistent project knowledge in the user's Knowledge Vault, 
    knowledge_root: ~/Documents/KnowledgeVault/<unique-id>
    ```
 
+This precedence is implemented in `src/discovery/resolve.mjs` and enforced, not merely described.
+Call `gentjin_discovery` with action `resolve` rather than resolving by hand, so the record and the
+enforced behavior cannot drift apart. When the implementation and this section disagree, the
+implementation is the authority.
+
+### Discovery Readiness Before Retrieval
+
+Reading memory is not enough on its own; readiness also requires that the source the task will
+change has been inspected in this session. Before any project edit:
+
+1. Call `gentjin_discovery` with action `resolve`.
+2. Read the source the change affects. Reads are recorded per session by the runtime.
+3. Call `gentjin_discovery` with action `scope` and the intended paths.
+4. Call `gentjin_discovery` with action `memory` recording the notes read, or `no_relevant_notes`.
+5. Confirm with action `status` that readiness is `ready`.
+
+A claimed note is only accepted when it exists inside the resolved knowledge root and was actually
+read this session. Claiming that no note applies is accepted only when the knowledge root holds no
+`memory-index.md`. Set `failed` only when retrieval genuinely failed, which reports degraded
+operation rather than blocking.
+
+Readiness is invalidated when an inspected file changes or is deleted, or when the checked-out
+revision moves. After invalidation, re-read the affected source and declare scope again. Reads are
+never refused, so recovery is always possible.
+
 ## Workflow Memory
 
 Use workflow memory for recurring commands, personal automation patterns, and repeatable computer tasks that are likely to be requested again. Keep cross-project workflows in the global GENTJIN workflow store and project-specific workflows in the current project vault.
@@ -70,15 +95,9 @@ If the user reports that a workflow did not work, do not mark it verified or cre
 
 ## Knowledge Vault Migration
 
-When the legacy `~/Documents/ObsidianVault/` directory exists and `~/Documents/KnowledgeVault/` does not, and the user explicitly authorizes the migration:
+The legacy-to-canonical vault rename is an install-time concern, not a runtime one. It is owned by the `install-gentjin` and `update-gentjin` commands and by `INSTALL.md`. Do not perform a vault directory rename during ordinary work.
 
-1. Verify the source is a directory and the destination does not exist.
-2. Rename only the vault directory; preserve all notes and hidden vault metadata.
-3. Update only the Obsidian application's saved vault path when explicitly authorized.
-4. Never rename, move, or modify the Obsidian application installation or unrelated application folders.
-5. Verify the destination, note count, and saved path after the rename.
-
-If the destination already exists, do not merge directories automatically; report the conflict and ask before proceeding. GENTJIN installation may perform this same guarded migration only after explicit user approval, and only when Obsidian is closed.
+When you encounter an obviously legacy vault layout *inside* a project vault, normalize the internal structure per the mapping below. Never rename or move the vault directory itself as a side effect of ordinary knowledge work.
 
 ## Vault Initialization
 
@@ -807,6 +826,51 @@ If an appropriate topic note already exists, update it instead of creating a dup
 
 Prefer one durable topic note over many small notes describing the same subject.
 
+### Capture as it happens
+
+Do not batch capture until the end of a session. Write a note the moment a decision crystallizes or a root cause is confirmed, while the reasoning is still fresh. Batching loses the reason and leaves only the outcome.
+
+### Route by what you discovered
+
+| Evidence discovered | Destination | Minimum useful content |
+| --- | --- | --- |
+| Confirmed failure and its correction | `issues/bugs/` | Symptom, cause, correction, verification |
+| A meaningful choice and the alternatives rejected | `architecture/decisions/` | Context, choice, alternatives, consequence |
+| A significant architecture choice | `architecture/decisions/` | Decision, rationale, tradeoffs, status |
+| A new or clarified business term | `knowledge/glossary.md` | Meaning, the rules it governs, links to code or docs |
+| A reusable implementation approach | `knowledge/patterns/` | Context, approach, when it applies |
+| A changed component responsibility | `architecture/modules/` | Responsibility, interfaces, dependencies |
+| A changed system relationship | `architecture/` | The new relationship and why |
+| Important unfinished work | `work-in-progress/` | State, attempts, next step, blockers |
+| An approved future improvement | `issues/enhancements/` | Problem, intended outcome, priority if known |
+
+Empty directories are correct when nothing useful has been discovered. Do not manufacture notes to fill them.
+
+### Keep the glossary a glossary
+
+`knowledge/glossary.md` holds definitions only: what a term means, the rules it governs, and where it is used. It is not a specification, a scratchpad, or a place for implementation decisions.
+
+Prefer a glossary that links to existing notes over creating a second competing context file.
+
+When the user uses a term that conflicts with the glossary, say so immediately and ask which meaning is intended. When a term is overloaded, propose a precise canonical name.
+
+Do not infer a business rule from a variable or field name alone. Confirm it.
+
+### Mark how a claim was established
+
+Not every statement in the vault carries the same weight. Label the basis so a later reader knows how far to trust it:
+
+- **User-confirmed** — the user stated it directly. Strongest available basis.
+- **Code-derived** — verified by reading current source, schema, or configuration. Re-check when that source changes.
+- **Inferred** — a reasonable reading that nobody confirmed. Never present it as established.
+- **Unverified** — recorded from an assumption or a report that was never checked.
+
+When new evidence contradicts an inferred claim, promote or correct it rather than deleting it. The fact that it was once inferred is itself worth knowing.
+
+### Mark superseded conclusions
+
+When new behavior contradicts a stored conclusion, update the note in place and mark what changed. Preserve the earlier reasoning when it explains why the change happened. Never leave two canonical notes making contradictory claims.
+
 ## Bug and Enhancement Notes
 
 For bug and enhancement notes, preserve the user's original intent near the beginning of the note.
@@ -882,6 +946,18 @@ Is the decision still current?
 
 `Status` answers the last question. When the accepted tradeoff is itself
 disputed later, record that in a new decision rather than rewriting the old one.
+
+### When a choice deserves an ADR
+
+Record a decision note only when all three are true:
+
+1. **Hard to reverse.** The cost of changing course later is real, not cosmetic.
+2. **Surprising without context.** A future reader would look at the code and wonder why it is built this way.
+3. **The result of a genuine tradeoff.** Real alternatives existed and one was chosen for stated reasons.
+
+If any one is missing, it is an ordinary implementation detail. Keep it in the change or session note instead. An ADR that records an obvious choice costs attention and teaches nothing.
+
+When a decision spans a longer explanation, write it once in the ADR and link to it from a shorter topic note. Do not restate the same narrative in two places.
 
 Supported statuses should include:
 
@@ -1233,7 +1309,8 @@ Never rely on conversation history or on a compaction summary as the only record
 of meaningful knowledge. Persist engineering meaning during normal work, keep
 `current.md` current enough to resume interrupted work, and update the daily
 session note at meaningful milestones. Recover the engineering state, not every
-keystroke.
+keystroke. See `compaction` for how temporary working context is condensed and
+handed off here only when it passes the significance test.
 
 Use Git as supporting evidence: repository, branch, commit, and changed files
 give the "what changed on this branch" answers. Notes supply the reasoning

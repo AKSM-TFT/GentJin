@@ -27,9 +27,24 @@ Installation direction:
 <source-root>/AGENTS.md    -> <opencode-root>/AGENTS.md
 <source-root>/command/**   -> <opencode-root>/command/**
 <source-root>/skills/**    -> <opencode-root>/skills/**
+<source-root>/schemas/**   -> <opencode-root>/schemas/**
+<source-root>/src/**       -> <opencode-root>/src/**  (includes src/discovery/)
+<source-root>/plugins/** -> <opencode-root>/plugins/**
+<source-root>/package.json -> <opencode-root>/package.json
+<source-root>/registry/**  -> <opencode-root>/registry/**
+<source-root>/plugins/**   -> <opencode-root>/plugins/**
+<source-root>/evals/**     -> <opencode-root>/evals/**
+<source-root>/scripts/**   -> <opencode-root>/scripts/**
+<source-root>/guardrails/** -> <opencode-root>/guardrails/**  (inert source; only /setup-git-guardrails places it into plugins/)
+<source-root>/docs/**      -> <opencode-root>/docs/**
+<source-root>/test/**      -> <opencode-root>/test/**
 installation metadata      -> <metadata-root>/manifest.json
                              <metadata-root>/version.json
 ```
+
+`test/` ships as part of the payload so the executable checks can run from the
+installation without the repository. `evals/` ships for the same reason. Neither
+contains generated output; traces are written outside the installation.
 
 Expected end state of an installation:
 
@@ -38,6 +53,14 @@ Expected end state of an installation:
 ├── AGENTS.md
 ├── command/
 ├── skills/
+├── schemas/
+├── src/
+├── registry/
+├── plugins/
+├── evals/
+├── scripts/
+├── docs/
+├── test/
 ├── opencode.jsonc
 └── .gentjin/
     ├── manifest.json
@@ -339,10 +362,12 @@ command/cleanup.md
 command/deployment-check.md
 command/git-push.md
 command/install-gentjin.md
+command/learn-skills.md
 command/pause.md
 command/project-review.md
 command/refactor.md
 command/report.md
+command/setup-git-guardrails.md
 command/resume.md
 command/revert-gentjin.md
 command/status.md
@@ -352,28 +377,80 @@ skills/api-design/SKILL.md
 skills/architecture-review/SKILL.md
 skills/backend-review/SKILL.md
 skills/cleanup/SKILL.md
+skills/compaction/SKILL.md
 skills/database-review/SKILL.md
 skills/dependency-review/SKILL.md
+skills/deployment-readiness/SKILL.md
 skills/frontend-review/SKILL.md
 skills/git-workflow/SKILL.md
+skills/incident-response/SKILL.md
 skills/integration-review/SKILL.md
 skills/knowledge-vault/SKILL.md
 skills/performance-review/SKILL.md
 skills/project-conventions/SKILL.md
-skills/refactoring/SKILL.md
+skills/refactoring-migration/SKILL.md
 skills/reporting/SKILL.md
 skills/requirements-review/SKILL.md
 skills/review-orchestrator/SKILL.md
 skills/security-review/SKILL.md
+skills/skill-authoring/SKILL.md
 skills/systematic-debugging/SKILL.md
 skills/test-strategy/SKILL.md
 skills/work-in-progress/SKILL.md
+schemas/task-record.schema.json
+schemas/task-event.schema.json
+src/schema/validate.mjs
+src/task/record.mjs
+src/task/completion-gate.mjs
+src/routing/route.mjs
+src/memory/failure-awareness.mjs
+src/trace/writer.mjs
+src/trace/ids.mjs
+src/trace/plugin-body.mjs
+src/trace/plugin-support.mjs
+src/guardrails/git-guardrails.mjs
+src/capabilities/registry.mjs
+src/capabilities/resolve.mjs
+src/capabilities/loader.mjs
+src/capabilities/loader.d.mts
+src/capabilities/adherence.mjs
+src/release/collect.mjs
+src/release/render.mjs
+src/release/vault.mjs
+src/discovery/resolve.mjs
+src/discovery/readiness.mjs
+src/discovery/gate.mjs
+src/discovery/gate.d.mts
+registry/skills.json
+registry/capabilities.json
+plugins/gentjin-trace.js
+plugins/gentjin-capabilities.ts
+scripts/build-registry.mjs
+scripts/build-capabilities.mjs
+evals/run.mjs
+evals/cases.mjs
+evals/workflow-scenarios.mjs
+evals/graders/index.mjs
+evals/fixtures/unsafe-secrets.json
+docs/architecture.md
+docs/deferred.md
+docs/integration-map.md
 ```
 
-The payload is copied by directory (`command/` and `skills/` recursively), so
-new files are installed automatically. Keep this list current: when a skill or
-command is added or removed, update this minimum set in the same change so
-verification still detects a missing install.
+The payload is copied by directory, so new files are installed automatically.
+Keep this list current: when a skill, command, or runtime file is added or
+removed, update this minimum set in the same change so verification still
+detects a missing install.
+
+After copying, run the shipped executable checks from `<opencode-root>`:
+
+```text
+node --test "test/**/*.test.mjs"
+node evals/run.mjs
+```
+
+Both must exit 0. If either fails, the install is incomplete; report the failing
+test names rather than reporting success.
 
 Also confirm:
 

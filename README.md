@@ -131,8 +131,28 @@ That means these work in plain conversation, with no command:
 A briefing stays compact — latest work, completed, key decisions, issues and
 discoveries, still in progress, next recommended step — and never presents an
 older session as current when Git or WIP shows newer work. Git is evidence for
-what changed; the notes hold the reasoning. Compaction or a closed session does
-not lose the engineering state.
+what changed; the notes hold the reasoning.
+
+Three systems cooperate without duplicating each other:
+
+```text
+conversation → compaction → active working context
+compaction → work-in-progress or knowledge-vault when appropriate
+```
+
+- **Compaction** = short-term compressed memory. Reconstructable working recall,
+  lowest authority, expires when work moves on.
+- **WIP** = task continuity. Unfinished state, blockers, and the next action.
+- **Knowledge Vault** = long-term project memory. Decisions, conventions, root
+  causes, and meaningful discoveries.
+
+Authority runs `current source code → user instructions → WIP → Knowledge
+Vault → compacted context`. Compaction hands durable facts to the vault and
+unfinished work to WIP, then keeps only the temporary remainder by pointer.
+`/pause` separates state into those three buckets; `/resume` rebuilds from
+WIP plus relevant vault notes plus current source rather than trusting an old
+summary. A compaction or a closed session therefore does not lose the
+engineering state.
 
 ## Memory retrieval
 
@@ -245,7 +265,9 @@ Run `/update-gentjin` for normal updates. It uses `<user-home>/.config/opencode/
 | --- | --- |
 | `/install-gentjin` | Install GENTJIN into your global OpenCode configuration. |
 | `/update-gentjin` | Update the installed GENTJIN copy from a newer repository state. |
+| `/learn-skills` | Load the full text of every installed skill into context for routing questions and corpus audits. |
 | `/revert-gentjin` | Revert the installed GENTJIN copy to a previous state, or remove one feature's command and skills (for example `/revert-gentjin refactor`). |
+| `/setup-git-guardrails` | Install, verify, or remove the guardrail that blocks destructive git commands. Never installed automatically. |
 | `/cleanup` | Finish current work with QA, cleanup, and a final report. |
 | `/report` | Turn the current work into a clear, evidence-based report. |
 | `/refactor` | Refactor a file or area into framework-native structure without changing behavior. |
@@ -269,8 +291,9 @@ of asking the agent to remember every rule at once.
 | Skill | Focus |
 | --- | --- |
 | `requirements-review` | Ambiguity, constraints, conflicts, and acceptance criteria before implementation. |
-| `architecture-review` | Structural changes, module boundaries, data flow, migration paths, and new-project scaffolding. |
+| `architecture-review` | Cross-module structural changes, boundaries, data flow, and new-project scaffolding. |
 | `project-conventions` | Learn an existing codebase, follow its conventions, and reuse what already exists. |
+| `refactoring-migration` | Staged execution of large refactors, data or contract migrations, dual-write, and flag lifecycle. |
 | `frontend-review` | Responsive UI, accessibility, UX states, and frontend performance. |
 | `backend-review` | Handlers, services, jobs, webhooks, async behavior, retries, and idempotency. |
 | `database-review` | Queries, data layers, performance, failures, and migration safety. |
@@ -278,14 +301,17 @@ of asking the agent to remember every rule at once.
 | `integration-review` | Defects at the seams between layers and systems. |
 | `refactoring` | Behavior-preserving splits into framework-native components, hooks, services, utils, and similar. |
 | `systematic-debugging` | Root-cause workflow for broken behavior and regressions. |
+| `incident-response` | Live production impact: severity, mitigation, rollback, timeline, and hotfix discipline. |
 | `test-strategy` | Risk-driven decisions about what to test and at which level. |
 | `security-review` | Authentication, authorization, secrets, input, and data integrity. |
 | `performance-review` | Evidence-based measurement, bottlenecks, and safe optimization. |
 | `dependency-review` | Dependency additions, upgrades, and replacement risk. |
+| `deployment-readiness` | Build and CI, environment parity, migration safety, rollback, and secret exposure. |
 | `review-orchestrator` | Shared engine behind the review commands; delegates to the skills above. |
 | `cleanup` | Pre-merge QA, debugging, cleanup, and production readiness. |
 | `git-workflow` | Guarded branches, commits, pull requests, and source control. |
 | `work-in-progress` | Pause, resume, and preserve unfinished implementation work. |
+| `compaction` | Condense older context into a lean working summary; route WIP and durable knowledge outward. |
 | `knowledge-vault` | Project discovery and persistent knowledge in the Knowledge Vault. |
 | `reporting` | Concise console reports and durable vault documentation. |
 
@@ -308,6 +334,10 @@ of asking the agent to remember every rule at once.
 - Keep the active context small and relevant.
 - Use the right review skill at the right trust boundary.
 - Preserve decisions, rejected approaches, and meaningful discoveries.
+- Track temporary QA, test, debug, seed, mock, and fixture artifacts in the
+  WIP ledger as they are created.
+- Write or update the durable change audit as the task evolves — previous
+  implementation, what changed, why, affected files, actual verification.
 
 ### Before handoff
 
@@ -323,6 +353,22 @@ of asking the agent to remember every rule at once.
 - Write an evidence-based report.
 - Capture reusable knowledge where it belongs.
 - Keep unfinished work visible with one clear next action.
+
+## Change audit and push hygiene
+
+Every task that modifies a project leaves a durable change audit in the
+project's `changes/` folder, following the canonical template. The audit
+records the previous implementation, what changed, why it changed, affected
+files, and what was actually verified — so the repository's history stays
+explainable later without relying on chat memory.
+
+Before any GitHub push, a mandatory cleanup gate scans the diff for
+task-created temporary artifacts: seed scripts, throwaway fixtures, scratch
+test routes, mock data added for local QA, ad-hoc verification scripts, and
+generated test output. These are removed or reverted before staging, and
+verification is re-run after cleanup. The branch or PR description is then a
+concise numbered list of real user-visible changes; the technical detail
+stays in the change audit, not in the PR body.
 
 ## Safe by default
 
@@ -352,12 +398,14 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── deployment-check.md
 │   ├── git-push.md
 │   ├── install-gentjin.md
+│   ├── learn-skills.md
 │   ├── pause.md
 │   ├── project-review.md
 │   ├── refactor.md
 │   ├── report.md
 │   ├── resume.md
 │   ├── revert-gentjin.md
+│   ├── setup-git-guardrails.md
 │   ├── status.md
 │   ├── task.md
 │   └── update-gentjin.md
@@ -366,24 +414,73 @@ GENTJIN is designed to make the cautious path the easy path:
 │   ├── architecture-review/
 │   ├── backend-review/
 │   ├── cleanup/
+│   ├── compaction/
 │   ├── database-review/
 │   ├── dependency-review/
+│   ├── deployment-readiness/
 │   ├── frontend-review/
 │   ├── git-workflow/
+│   ├── incident-response/
 │   ├── integration-review/
 │   ├── knowledge-vault/
 │   ├── performance-review/
 │   ├── project-conventions/
-│   ├── refactoring/
+│   ├── refactoring-migration/
 │   ├── reporting/
 │   ├── requirements-review/
 │   ├── review-orchestrator/
 │   ├── security-review/
+│   ├── skill-authoring/
 │   ├── systematic-debugging/
 │   ├── test-strategy/
 │   └── work-in-progress/
+├── schemas/                   Portable JSON Schema contracts
+│   ├── task-record.schema.json
+│   └── task-event.schema.json
+├── guardrails/                Opt-in git guardrail plugin, not auto-installed
+├── src/                       Enforcement layer (Node 24, zero dependencies)
+│   ├── schema/validate.mjs    JSON Schema subset validator
+│   ├── task/record.mjs        Lifecycle, states, action capture
+│   ├── task/completion-gate.mjs
+│   ├── routing/route.mjs      Routing, scope and capability contracts
+│   ├── memory/failure-awareness.mjs
+│   ├── trace/writer.mjs       JSONL traces, redaction, coverage
+│   ├── trace/plugin-body.mjs  Trace plugin implementation
+│   ├── trace/plugin-support.mjs
+│   └── guardrails/git-guardrails.mjs
+├── registry/skills.json       Generated skill and capability registry
+├── plugins/gentjin-trace.js  Trace plugin using real OpenCode hooks
+│   ├── gentjin-capabilities.ts  Capability loader + guarded-action block
+├── src/capabilities/         Registry, resolution, loader, adherence state
+├── src/discovery/            Project resolution and discovery readiness gate
+├── src/release/              Release-notes collection, rendering, vault save
+├── registry/capabilities.json  Unified skill + command catalog
+├── scripts/build-registry.mjs
+├── scripts/build-capabilities.mjs
+├── evals/                     Executable evaluation suite
+│   ├── run.mjs                Contract and live modes
+│   ├── cases.mjs
+│   ├── workflow-scenarios.mjs 14 roadmap scenario checks
+│   ├── graders/index.mjs
+│   ├── scenarios/             11 scenario definitions
+│   └── fixtures/              Synthetic, non-secret data only
+├── test/                      117 unit and contract tests
+├── docs/
+│   ├── architecture.md
+│   └── deferred.md
 └── opencode.jsonc            Local OpenCode configuration (not installed)
 ```
+
+## Verifying an installation
+
+```bash
+node --test "test/**/*.test.mjs"   # 88 tests
+node evals/run.mjs                 # contract evaluation, deterministic
+```
+
+Both exit 0 on success. `node evals/run.mjs --mode live` runs the scenarios
+through a real model and needs credentials; it is not part of the default check
+and its results are never merged with contract results.
 
 ## Contributing
 

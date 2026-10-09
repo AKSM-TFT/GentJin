@@ -11,3 +11,16 @@ GENTJIN installs into `<opencode-root>/AGENTS.md`, `<opencode-root>/command/`, a
 If a GENTJIN installation already exists, use `/update-gentjin` instead of restarting the architecture.
 
 Print the runbook's final summary, including the OpenCode root, metadata root, installed skill and command counts, legacy migration state, vault state, permission state, and skipped conflicts, then remind the user to restart OpenCode. Tell the user that the cloned repository can be deleted after a successful installation.
+
+## Confirm Activation
+
+Installation writes files; it does not teach the running session. OpenCode reads `AGENTS.md` in full at startup, reads only the `name` and `description` of each skill, and loads no command at all until the user invokes it. So a successful install is not an active install until OpenCode restarts.
+
+After the user restarts, verify the installation actually took effect before claiming it is live:
+
+1. Confirm the expected commands appear in the `/` list, including `/install-gentjin` and `/update-gentjin`.
+2. Confirm the expected skill count is present in the available skills list, with every `name` and `description` intact.
+3. Confirm the global `AGENTS.md` rules are loaded — the tell is that the capture rules and report format are already in effect without being re-read.
+4. If a command or skill is missing, name the specific file and directory that is short. Do not report success from the filesystem alone.
+
+When the user asks whether GENTJIN is installed, updated, or active, run this check rather than inferring it from the repository. Use `/learn-skills` when they want the full skill contents in context rather than only the descriptions.

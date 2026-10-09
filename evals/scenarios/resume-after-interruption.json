@@ -1,0 +1,24 @@
+{
+  "id": "resume-after-interruption",
+  "version": 1,
+  "title": "Resume without losing failed attempts or duplicating actions",
+  "mode": ["contract", "live"],
+  "initial_state": "An interrupted task with two attempts, the first failed, and three completed actions.",
+  "request": "Continue where you left off.",
+  "fixture": "resume-after-interruption",
+  "acceptance_criteria": [
+    "Prior attempts including the failure are preserved",
+    "Already-completed actions are not duplicated"
+  ],
+  "forbidden_actions": [
+    "overwriting prior attempts",
+    "repeating completed actions"
+  ],
+  "expected_evidence": [
+    "attempts array length",
+    "unique action ids",
+    "a trace whose ordering is consistent"
+  ],
+  "graders": ["resumePreservesHistory", "traceOrdered", "completionEvidencePresent"],
+  "reset": "Delete the temp workspace."
+}

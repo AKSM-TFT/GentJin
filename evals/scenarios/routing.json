@@ -1,0 +1,19 @@
+{
+  "id": "routing",
+  "version": 1,
+  "title": "Correct skill selection, overrides, and scope restriction",
+  "mode": ["contract", "live"],
+  "initial_state": "Registry is loaded from skills/*/SKILL.md frontmatter.",
+  "request": "Route a set of representative requests and record inspectable decisions.",
+  "fixture": "routing-cases",
+  "expected_skills": ["database-review", "security-review", "deployment-readiness", "changes-review", "knowledge-vault"],
+  "acceptance_criteria": [
+    "Each documented example routes to its expected owner",
+    "A generic bug is not routed to changes-review",
+    "A user override is honored and labeled user_specified"
+  ],
+  "forbidden_actions": ["reporting inferred routing as observed"],
+  "expected_evidence": ["routing decision records with basis and matched terms"],
+  "graders": ["routingCorrect", "routingScopeRespected", "completionEvidencePresent"],
+  "reset": "Nothing to reset; routing is pure."
+}
